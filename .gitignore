@@ -1,0 +1,19 @@
+# IDEA 专属配置（必忽略）
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code 专属配置（必忽略）
+.vscode/
+
+# 项目编译垃圾文件
+target/
+build/
+dist/
+node_modules/
+
+# 系统无关文件
+*.log
+.DS_Store
+Thumbs.db
