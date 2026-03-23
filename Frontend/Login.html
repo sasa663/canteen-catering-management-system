@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂餐饮管理系统 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .login-box {
+            width: 400px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .login-box:hover {
+            box-shadow: 0 0 25px rgba(45, 140, 240, 0.2);
+        }
+        
+        .title {
+            text-align: center;
+            color: #2d8cf0;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .input-item {
+            margin-bottom: 20px;
+        }
+        
+        input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #2d8cf0;
+            box-shadow: 0 0 8px rgba(45, 140, 240, 0.1);
+        }
+        
+        input::placeholder {
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .role-box {
+            margin: 10px 0 25px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .role-box input[type="radio"] {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+            margin-right: 4px;
+            accent-color: #2d8cf0;
+        }
+        
+        .role-box label {
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .role-box label:hover {
+            color: #2d8cf0;
+        }
+        
+        .login-btn {
+            width: 100%;
+            height: 48px;
+            background-color: #2d8cf0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background-color: #1b74d0;
+        }
+        
+        .login-btn:active {
+            background-color: #1565b9;
+        }
+        
+        .reg-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        a {
+            color: #2d8cf0;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        a:hover {
+            color: #1b74d0;
+            text-decoration: underline;
+        }
+        
+        .tip-text {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+        <h2 class="title">食堂餐饮管理系统</h2>
+
+        <div class="input-item">
+            <input type="text" id="username" placeholder="请输入账号">
+            <div class="tip-text" id="usernameTip"></div>
+        </div>
+
+        <div class="input-item">
+            <input type="password" id="password" placeholder="请输入密码">
+            <div class="tip-text" id="passwordTip"></div>
+        </div>
+
+        <div class="role-box">
+            <label><input type="radio" name="role" value="student" checked> 学生</label>
+            <label><input type="radio" name="role" value="merchant"> 商家</label>
+            <label><input type="radio" name="role" value="admin"> 管理员</label>
+        </div>
+
+        <button class="login-btn" onclick="login()">登录</button>
+
+        <div class="reg-link">
+            没有账号？<a href="register.html">注册</a>
+        </div>
+    </div>
+
+    <script>
+        // 清空提示框
+        function clearTips() {
+            document.getElementById('usernameTip').style.display = 'none';
+            document.getElementById('passwordTip').style.display = 'none';
+        }
+
+        function login() {
+            // 清空之前的提示
+            clearTips();
+
+            let username = document.getElementById("username").value.trim();
+            let password = document.getElementById("password").value.trim();
+            let role = document.querySelector('input[name="role"]:checked').value;
+            let hasError = false;
+
+            // 验证账号
+            if (!username) {
+                document.getElementById('usernameTip').textContent = '账号不能为空！';
+                document.getElementById('usernameTip').style.display = 'block';
+                hasError = true;
+            } else if (username.length < 4) {
+                document.getElementById('usernameTip').textContent = '账号至少4位！';
+                document.getElementById('usernameTip').style.display = 'block';
+                hasError = true;
+            }
+
+            // 验证密码
+            if (!password) {
+                document.getElementById('passwordTip').textContent = '密码不能为空！';
+                document.getElementById('passwordTip').style.display = 'block';
+                hasError = true;
+            } else if (password.length < 6) {
+                document.getElementById('passwordTip').textContent = '密码至少6位！';
+                document.getElementById('passwordTip').style.display = 'block';
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // 从本地存储读取用户
+            let userStr = localStorage.getItem("user_" + username);
+            if (!userStr) {
+                alert("账号不存在，请先注册！");
+                return;
+            }
+
+            let user = JSON.parse(userStr);
+
+            // 分情况提示错误
+            if (user.password !== password) {
+                alert("密码错误！");
+                return;
+            }
+            if (user.role !== role) {
+                alert("角色选择错误！当前账号的角色是：" +
+                    (user.role === 'student' ? '学生' : user.role === 'merchant' ? '商家' : '管理员'));
+                return;
+            }
+
+            // 存储当前登录用户信息
+            localStorage.setItem('currentUser', JSON.stringify({
+                username: username,
+                role: role,
+                nickname: user.nickname || username
+            }));
+
+            // 根据角色显示不同欢迎语
+            let roleName = {
+                student: '同学',
+                merchant: '商家',
+                admin: '管理员'
+            }[role];
+
+            alert(`登录成功！欢迎回来，${roleName}！`);
+            // 跳转到首页（启用跳转）
+            location.href = "Admin.html";
+        }
+
+        // 输入框聚焦时清空提示
+        document.getElementById('username').addEventListener('focus', clearTips);
+        document.getElementById('password').addEventListener('focus', clearTips);
+    </script>
+</body>
+
+</html>

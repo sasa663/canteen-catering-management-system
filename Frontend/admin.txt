@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂餐饮管理系统 - 超级管理中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* 侧边栏主样式 */
+        
+        .sidebar {
+            width: 220px;
+            background: #2d8cf0;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        /* 一级菜单 */
+        
+        .menu-item {
+            padding: 14px 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        
+        .menu-item.active,
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        /* 二级子菜单 */
+        
+        .sub-menu {
+            background: #2379d1;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .sub-menu.active {
+            display: flex;
+        }
+        
+        .sub-item {
+            padding: 12px 35px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        
+        .sub-item.active,
+        .sub-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        /* 主内容区 */
+        
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+        /* 顶部导航 */
+        
+        .header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            padding: 6px 15px;
+            background: #f56c6c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background: #e45656;
+        }
+        /* 内容容器 */
+        
+        .content {
+            padding: 25px;
+        }
+        /* 通用卡片 */
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* 通用按钮 */
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2d8cf0;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #36b36d;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ff9500;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f56c6c;
+            color: white;
+        }
+        
+        .btn-default {
+            background: #e5e7eb;
+            color: #666;
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        /* 搜索筛选栏 */
+        
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            transition: 0.2s;
+        }
+        
+        .search-input:focus {
+            border-color: #2d8cf0;
+        }
+        
+        .select-input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            min-width: 120px;
+        }
+        /* 通用表格 */
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .table tr:hover {
+            background: #fafafa;
+        }
+        /* 状态标签 */
+        
+        .tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .tag-pending {
+            background: #ff9500;
+        }
+        /* 待审核 */
+        
+        .tag-pass {
+            background: #36b36d;
+        }
+        /* 审核通过 */
+        
+        .tag-reject {
+            background: #f56c6c;
+        }
+        /* 已驳回 */
+        
+        .tag-freeze {
+            background: #909399;
+        }
+        /* 已冻结 */
+        
+        .tag-cancel {
+            background: #333;
+        }
+        /* 已注销 */
+        
+        .tag-normal {
+            background: #2d8cf0;
+        }
+        /* 正常营业 */
+        
+        .tag-close {
+            background: #f56c6c;
+        }
+        /* 暂停营业 */
+        /* 商家评级标签 */
+        
+        .grade-A {
+            color: #36b36d;
+            font-weight: bold;
+        }
+        
+        .grade-B {
+            color: #2d8cf0;
+            font-weight: bold;
+        }
+        
+        .grade-C {
+            color: #ff9500;
+            font-weight: bold;
+        }
+        
+        .grade-D {
+            color: #f56c6c;
+            font-weight: bold;
+        }
+        /* 弹窗样式 */
+        
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            display: none;
+        }
+        
+        .modal-mask.active {
+            display: flex;
+        }
+        
+        .modal-box {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-item label {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .form-item input,
+        .form-item textarea,
+        .form-item select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            resize: none;
+        }
+        
+        .form-item textarea {
+            min-height: 80px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        /* 数据统计面板 */
+        
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-card {
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+        
+        .stats-card h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .stats-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .stats-total {
+            background: #2d8cf0;
+        }
+        
+        .stats-pending {
+            background: #ff9500;
+        }
+        
+        .stats-pass {
+            background: #36b36d;
+        }
+        
+        .stats-freeze {
+            background: #909399;
+        }
+        /* 菜品/桌台管理小卡片 */
+        
+        .item-card {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .item-name {
+            font-weight: 600;
+        }
+        
+        .item-desc {
+            font-size: 12px;
+            color: #999;
+        }
+        /* 经营数据图表容器 */
+        
+        .chart-box {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+        }
+        /* 页面容器 - 默认隐藏 */
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        /* 空数据样式 */
+        
+        .empty-data {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .empty-data i {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        /* 权限勾选框 */
+        
+        .permission-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">食堂管理系统</div>
+        <!-- 系统概览 -->
+        <div class="menu-item" onclick="toggleMenu('sysMenu')">
+            <span><i class="fa-solid fa-chart-line"></i> 系统概览</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="sysMenu">
+            <div class="sub-item active" onclick="switchPage('dashboard')">数据总览</div>
+            <div class="sub-item" onclick="switchPage('userManage')">全局用户管理</div>
+        </div>
+
+        <!-- 商家管理 -->
+        <div class="menu-item" onclick="toggleMenu('merchantMenu')">
+            <span><i class="fa-solid fa-store"></i> 商家管理</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="merchantMenu">
+            <div class="sub-item" onclick="switchPage('merchantList')">商家列表&授权</div>
+            <div class="sub-item" onclick="switchPage('qualificationCheck')">资质审核</div>
+            <div class="sub-item" onclick="switchPage('shopGoods')">门店&菜品管理</div>
+            <div class="sub-item" onclick="switchPage('merchantAccount')">账号权限管理</div>
+            <div class="sub-item" onclick="switchPage('orderMonitor')">运营订单监管</div>
+            <div class="sub-item" onclick="switchPage('marketingCheck')">营销活动审核</div>
+            <div class="sub-item" onclick="switchPage('commentComplaint')">评价投诉处理</div>
+            <div class="sub-item" onclick="switchPage('dataRisk')">数据与风控管理</div>
+        </div>
+
+        <!-- 学生管理 -->
+        <div class="menu-item" onclick="toggleMenu('studentMenu')">
+            <span><i class="fa-solid fa-user-graduate"></i> 学生管理</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="studentMenu">
+            <div class="sub-item" onclick="switchPage('studentList')">学生信息列表</div>
+            <div class="sub-item" onclick="switchPage('rechargeRecord')">充值记录管理</div>
+            <div class="sub-item" onclick="switchPage('consumeStats')">消费统计分析</div>
+        </div>
+
+        <!-- 个人中心 -->
+        <div class="menu-item" onclick="switchPage('profile')" style="margin-top: auto;">
+            <span><i class="fa-solid fa-user"></i> 个人中心</span>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle">数据总览</h2>
+            <div class="user-info">
+                <span><i class="fa-solid fa-user-shield"></i> <span id="adminName">超级管理员</span></span>
+                <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> 退出登录</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 数据总览 -->
+            <div class="page active" id="dashboard">
+                <div class="stats-panel">
+                    <div class="stats-card stats-total">
+                        <h3>0</h3>
+                        <p>总商家数</p>
+                    </div>
+                    <div class="stats-card stats-pending">
+                        <h3>0</h3>
+                        <p>待审核商家</p>
+                    </div>
+                    <div class="stats-card stats-pass">
+                        <h3>0</h3>
+                        <p>正常经营商家</p>
+                    </div>
+                    <div class="stats-card stats-freeze">
+                        <h3>0</h3>
+                        <p>已冻结商家</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">商家经营TOP5</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="empty-data">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 全局用户管理 -->
+            <div class="page" id="userManage">
+                <div class="card">
+                    <div class="card-title">全局用户列表</div>
+                    <div class="search-filter">
+                        <input type="text" class="search-input" placeholder="搜索账号/手机号">
+                        <select class="select-input"><option value="all">全部角色</option><option value="student">学生</option><option value="merchant">商家</option></select>
+                    </div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="empty-data">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 商家列表 -->
+            <div class="page" id="merchantList">
+                <div class="card">
+                    <div class="card-title"><span>商家列表&授权</span><button class="btn btn-primary" onclick="openModal('addMerchantModal')">新增商家</button></div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="empty-data">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 资质审核 -->
+            <div class="page" id="qualificationCheck">
+                <div class="card">
+                    <div class="card-title">商家资质审核</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="empty-data">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 门店菜品 -->
+            <div class="page" id="shopGoods">
+                <div class="card">
+                    <div class="card-title">门店&菜品管理</div>
+                    <div class="empty-data">请选择商家</div>
+                </div>
+            </div>
+
+            <!-- 商家账号 -->
+            <div class="page" id="merchantAccount">
+                <div class="card">
+                    <div class="card-title">商家账号权限管理</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="empty-data">请选择商家</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 订单监管 -->
+            <div class="page" id="orderMonitor">
+                <div class="card">
+                    <div class="card-title">订单监管</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="7" class="empty-data">请选择商家</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 营销审核 -->
+            <div class="page" id="marketingCheck">
+                <div class="card">
+                    <div class="card-title">营销活动审核</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="7" class="empty-data">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 评价投诉 -->
+            <div class="page" id="commentComplaint">
+                <div class="card">
+                    <div class="card-title">评价投诉处理</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="empty-data">暂无数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 数据风控 -->
+            <div class="page" id="dataRisk">
+                <div class="card">
+                    <div class="card-title">数据与风控管理</div>
+                    <div class="empty-data">请选择商家</div>
+                </div>
+            </div>
+
+            <!-- 个人中心 -->
+            <div class="page" id="profile">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">个人信息</div>
+                    <div class="modal-form">
+                        <div class="form-item"><label>管理员账号</label><input type="text" disabled value="超级管理员"></div>
+                        <div class="modal-footer"><button class="btn btn-primary" onclick="saveProfile()">保存</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学生信息列表 -->
+            <div class="page" id="studentList">
+                <div class="card">
+                    <div class="card-title"><span>学生信息列表</span><button class="btn btn-primary" onclick="openModal('addStudentModal')">新增学生</button></div>
+                    <div class="search-filter">
+                        <input type="text" class="search-input" placeholder="搜索学号/姓名">
+                        <select class="select-input"><option value="all">全部状态</option><option value="normal">正常</option></select>
+                    </div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="empty-data">暂无学生数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 充值记录 -->
+            <div class="page" id="rechargeRecord">
+                <div class="card">
+                    <div class="card-title">充值记录管理</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="empty-data">暂无充值记录</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 消费统计 -->
+            <div class="page" id="consumeStats">
+                <div class="stats-panel">
+                    <div class="stats-card" style="background:#2d8cf0">
+                        <h3>0</h3>
+                        <p>总消费金额</p>
+                    </div>
+                    <div class="stats-card" style="background:#36b36d">
+                        <h3>0</h3>
+                        <p>今日消费次数</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">消费排行</div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="empty-data">暂无统计数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 菜单展开/收起
+        function toggleMenu(menuId) {
+            const subMenu = document.getElementById(menuId);
+            subMenu.classList.toggle('active');
+            const arrow = subMenu.previousElementSibling.querySelector('.fa-chevron-down');
+            arrow.style.transform = subMenu.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+
+        // 页面切换
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            const titleMap = {
+                dashboard: '数据总览',
+                userManage: '全局用户管理',
+                merchantList: '商家列表&授权',
+                qualificationCheck: '资质审核',
+                shopGoods: '门店&菜品管理',
+                merchantAccount: '账号权限管理',
+                orderMonitor: '运营订单监管',
+                marketingCheck: '营销活动审核',
+                commentComplaint: '评价投诉处理',
+                dataRisk: '数据与风控管理',
+                profile: '个人中心',
+                studentList: '学生信息列表',
+                rechargeRecord: '充值记录管理',
+                consumeStats: '消费统计分析'
+            };
+            document.getElementById('pageTitle').textContent = titleMap[pageId];
+
+            document.querySelectorAll('.sub-item').forEach(i => i.classList.remove('active'));
+            document.querySelector(`[onclick="switchPage('${pageId}')"]`).classList.add('active');
+        }
+
+        // 弹窗/操作占位函数
+        function openModal(modalId) {
+            alert(`打开弹窗：${modalId}`);
+        }
+
+        function logout() {
+            confirm('确定退出？') && alert('已退出');
+        }
+
+        function saveProfile() {
+            alert('保存成功');
+        }
+
+        // 数据加载占位
+        function loadStudentList() {}
+
+        function loadRechargeList() {}
+
+        function loadGlobalUserList() {}
+
+        function loadMerchantList() {}
+
+        function loadQualificationList() {}
+
+        function loadShopGoodsInfo() {}
+
+        function loadMerchantAccountList() {}
+
+        function loadOrderList() {}
+
+        function loadMarketingList() {}
+
+        function loadCommentComplaintList() {}
+
+        function loadMerchantRiskData() {}
+
+        // 初始化
+        window.onload = () => toggleMenu('sysMenu');
+    </script>
+</body>
+
+</html>

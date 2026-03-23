@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂点餐系统-学生端</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        .card-hover {
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        #dishPage {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 顶部导航 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <span class="navbar-brand">食堂点餐系统</span>
+            <div class="nav nav-pills text-white">
+                <button class="nav-link text-white active" onclick="switchPanel('shop')">
+                <i class="bi bi-shop"></i> 点餐
+            </button>
+                <button class="nav-link text-white" onclick="switchPanel('cart')">
+                <i class="bi bi-cart3"></i> 购物车 <span id="cartCount" class="badge bg-danger">0</span>
+            </button>
+                <button class="nav-link text-white" onclick="switchPanel('order')">
+                <i class="bi bi-card-list"></i> 我的订单
+            </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 mb-5">
+        <!-- 1. 点餐页面：分类 + 商家 -->
+        <div id="shop" class="panel active">
+            <!-- 分类导航 -->
+            <div class="btn-group mb-4 w-100">
+                <button class="btn btn-outline-primary active" data-type="all">全部分类</button>
+                <button class="btn btn-outline-primary" data-type="rice">米饭套餐类</button>
+                <button class="btn btn-outline-primary" data-type="noodle">面食类</button>
+                <button class="btn btn-outline-primary" data-type="snack">小吃饮品类</button>
+            </div>
+
+            <!-- 商家列表 -->
+            <h5 class="mb-3">商家窗口</h5>
+            <div class="row g-3" id="shopList">
+                <!-- 米饭套餐类商家 -->
+                <div class="col-md-4 col-sm-6" data-type="rice">
+                    <div class="card card-hover h-100" onclick="openShop(1, '一号套餐窗口')">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shop-window fs-1 text-primary"></i>
+                            <h5 class="mt-2">一号套餐窗口</h5>
+                            <p class="text-muted small">主营：盖浇饭、套餐</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6" data-type="rice">
+                    <div class="card card-hover h-100" onclick="openShop(2, '二号套餐窗口')">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shop-window fs-1 text-primary"></i>
+                            <h5 class="mt-2">二号套餐窗口</h5>
+                            <p class="text-muted small">主营：小炒、套餐</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 面食类商家 -->
+                <div class="col-md-4 col-sm-6" data-type="noodle">
+                    <div class="card card-hover h-100" onclick="openShop(3, '特色面食窗口')">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shop-window fs-1 text-warning"></i>
+                            <h5 class="mt-2">特色面食窗口</h5>
+                            <p class="text-muted small">主营：牛肉面、拌面</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6" data-type="noodle">
+                    <div class="card card-hover h-100" onclick="openShop(4, '汤面米线窗口')">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shop-window fs-1 text-warning"></i>
+                            <h5 class="mt-2">汤面米线窗口</h5>
+                            <p class="text-muted small">主营：米线、汤面</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 小吃饮品类商家 -->
+                <div class="col-md-4 col-sm-6" data-type="snack">
+                    <div class="card card-hover h-100" onclick="openShop(5, '小吃炸物窗口')">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shop-window fs-1 text-success"></i>
+                            <h5 class="mt-2">小吃炸物窗口</h5>
+                            <p class="text-muted small">主营：薯条、炸鸡</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6" data-type="snack">
+                    <div class="card card-hover h-100" onclick="openShop(6, '冷饮奶茶窗口')">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shop-window fs-1 text-success"></i>
+                            <h5 class="mt-2">冷饮奶茶窗口</h5>
+                            <p class="text-muted small">主营：饮料、奶茶</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 商家菜品页面 -->
+        <div id="dishPage">
+            <button class="btn btn-outline-secondary mb-3" onclick="backToShop()">← 返回商家列表</button>
+            <h4 id="currentShopName" class="mb-3"></h4>
+            <div class="row g-3" id="dishList"></div>
+        </div>
+
+        <!-- 3. 购物车 -->
+        <div id="cart" class="panel">
+            <div class="card">
+                <div class="card-header">
+                    <h5>购物车</h5>
+                </div>
+                <div class="card-body">
+                    <div id="cartEmpty" class="text-center py-5">
+                        <i class="bi bi-cart-x fs-1 text-muted"></i>
+                        <p class="mt-2">购物车为空</p>
+                    </div>
+                    <div id="cartContent" class="d-none">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>菜品</th>
+                                    <th>单价</th>
+                                    <th>数量</th>
+                                    <th>小计</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartTable"></tbody>
+                        </table>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <h5>总计：<span id="cartTotal" class="text-danger">¥0.00</span></h5>
+                            <button id="submitOrder" class="btn btn-success">提交订单</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 我的订单 -->
+        <div id="order" class="panel">
+            <div class="card">
+                <div class="card-header">
+                    <h5>我的订单</h5>
+                </div>
+                <div class="card-body">
+                    <div id="orderEmpty" class="text-center py-5">
+                        <i class="bi bi-file-text fs-1 text-muted"></i>
+                        <p class="mt-2">暂无订单</p>
+                    </div>
+                    <div id="orderList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 本地数据
+        let cart = JSON.parse(localStorage.getItem('canteenCart')) || [];
+        let orders = JSON.parse(localStorage.getItem('canteenOrders')) || [];
+
+        // 商家对应菜品数据
+        const shopDishes = {
+            1: [{
+                id: 101,
+                name: "鱼香肉丝盖饭",
+                price: 18
+            }, {
+                id: 102,
+                name: "麻婆豆腐盖饭",
+                price: 16
+            }],
+            2: [{
+                id: 201,
+                name: "红烧排骨套餐",
+                price: 22
+            }, {
+                id: 202,
+                name: "土豆烧肉套餐",
+                price: 20
+            }],
+            3: [{
+                id: 301,
+                name: "红烧牛肉面",
+                price: 20
+            }, {
+                id: 302,
+                name: "葱油拌面",
+                price: 15
+            }],
+            4: [{
+                id: 401,
+                name: "鸡汤米线",
+                price: 18
+            }, {
+                id: 402,
+                name: "番茄鸡蛋面",
+                price: 16
+            }],
+            5: [{
+                id: 501,
+                name: "炸薯条",
+                price: 8
+            }, {
+                id: 502,
+                name: "炸鸡块",
+                price: 12
+            }],
+            6: [{
+                id: 601,
+                name: "冰镇可乐",
+                price: 3
+            }, {
+                id: 602,
+                name: "珍珠奶茶",
+                price: 10
+            }]
+        };
+
+        // 页面切换
+        function switchPanel(panelName) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(panelName).classList.add('active');
+            document.getElementById('dishPage').style.display = 'none';
+        }
+
+        // 分类筛选商家
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            renderCart();
+            renderOrders();
+
+            // 分类切换
+            const btns = document.querySelectorAll('[data-type]');
+            btns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    btns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const type = this.dataset.type;
+                    document.querySelectorAll('#shopList > div').forEach(item => {
+                        if (type === 'all' || item.dataset.type === type) item.style.display = 'block';
+                        else item.style.display = 'none';
+                    });
+                });
+            });
+        });
+
+        // 打开商家菜品
+        function openShop(shopId, shopName) {
+            document.getElementById('shop').classList.remove('active');
+            document.getElementById('dishPage').style.display = 'block';
+            document.getElementById('currentShopName').textContent = shopName + " - 菜品";
+
+            const dishList = document.getElementById('dishList');
+            dishList.innerHTML = '';
+            shopDishes[shopId].forEach(item => {
+                dishList.innerHTML += `
+        <div class="col-md-4 col-sm-6">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <h5>${item.name}</h5>
+                    <p class="text-danger fs-5">¥${item.price}</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-success w-100 addCart" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">加入购物车</button>
+                </div>
+            </div>
+        </div>`;
+            });
+            initAddCart();
+        }
+
+        // 返回商家列表
+        function backToShop() {
+            document.getElementById('dishPage').style.display = 'none';
+            document.getElementById('shop').classList.add('active');
+        }
+
+        // 加入购物车
+        function initAddCart() {
+            document.querySelectorAll('.addCart').forEach(btn => {
+                btn.onclick = () => {
+                    const item = {
+                        id: btn.dataset.id,
+                        name: btn.dataset.name,
+                        price: +btn.dataset.price,
+                        num: 1
+                    };
+                    const index = cart.findIndex(i => i.id === item.id);
+                    index > -1 ? cart[index].num++ : cart.push(item);
+                    saveCart();
+                    alert(item.name + " 已加入购物车");
+                }
+            });
+        }
+
+        // 保存购物车
+        function saveCart() {
+            localStorage.setItem('canteenCart', JSON.stringify(cart));
+            updateCartCount();
+            renderCart();
+        }
+
+        // 更新购物车数量
+        function updateCartCount() {
+            document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.num, 0);
+        }
+
+        // 渲染购物车
+        function renderCart() {
+            const table = document.getElementById('cartTable');
+            const empty = document.getElementById('cartEmpty');
+            const content = document.getElementById('cartContent');
+            const total = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                empty.classList.remove('d-none');
+                content.classList.add('d-none');
+                return;
+            }
+            empty.classList.add('d-none');
+            content.classList.remove('d-none');
+            table.innerHTML = '';
+            let sum = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.num;
+                sum += subtotal;
+                table.innerHTML += `
+        <tr>
+            <td>${item.name}</td>
+            <td>¥${item.price}</td>
+            <td>
+                <button class="btn btn-sm btn-secondary minus" data-id="${item.id}">-</button>
+                <span class="mx-2">${item.num}</span>
+                <button class="btn btn-sm btn-secondary plus" data-id="${item.id}">+</button>
+            </td>
+            <td>¥${subtotal}</td>
+            <td><button class="btn btn-sm btn-danger del" data-id="${item.id}">删除</button></td>
+        </tr>`;
+            });
+            total.textContent = `¥${sum.toFixed(2)}`;
+
+            // 购物车操作
+            document.querySelectorAll('.minus').forEach(btn => btn.onclick = () => {
+                const i = cart.findIndex(x => x.id === btn.dataset.id);
+                cart[i].num > 1 ? cart[i].num-- : cart.splice(i, 1);
+                saveCart();
+            });
+            document.querySelectorAll('.plus').forEach(btn => btn.onclick = () => {
+                cart.find(x => x.id === btn.dataset.id).num++;
+                saveCart();
+            });
+            document.querySelectorAll('.del').forEach(btn => btn.onclick = () => {
+                cart = cart.filter(x => x.id !== btn.dataset.id);
+                saveCart();
+            });
+
+            // 提交订单
+            document.getElementById('submitOrder').onclick = () => {
+                orders.push({
+                    id: Date.now(),
+                    time: new Date().toLocaleString(),
+                    list: [...cart],
+                    total: total.textContent
+                });
+                localStorage.setItem('canteenOrders', JSON.stringify(orders));
+                cart = [];
+                saveCart();
+                alert('订单提交成功！');
+                switchPanel('order');
+                renderOrders();
+            }
+        }
+
+        // 渲染订单
+        function renderOrders() {
+            const list = document.getElementById('orderList');
+            const empty = document.getElementById('orderEmpty');
+            if (orders.length === 0) {
+                empty.classList.remove('d-none');
+                list.innerHTML = '';
+                return;
+            }
+            empty.classList.add('d-none');
+            list.innerHTML = '';
+            orders.forEach(o => {
+                let html = `<div class="border p-3 mb-3">`;
+                html += `<p>订单号：${o.id}<br>下单时间：${o.time}</p><hr>`;
+                o.list.forEach(i => html += `<p>${i.name} ×${i.num}  ¥${(i.price*i.num).toFixed(2)}</p>`);
+                html += `<h6 class="text-end text-danger">${o.total}</h6></div>`;
+                list.innerHTML += html;
+            });
+        }
+    </script>
+</body>
+
+</html>

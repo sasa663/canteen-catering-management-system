@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂餐饮管理系统 - 注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .register-box {
+            width: 420px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .title {
+            text-align: center;
+            color: #2d8cf0;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .input-item {
+            margin-bottom: 20px;
+        }
+        
+        input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        input:focus {
+            border-color: #2d8cf0;
+        }
+        /* 角色选择样式 */
+        
+        .role-box {
+            margin: 10px 0 20px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .role-box input[type="radio"] {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+        
+        .role-box label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        /* 注册按钮 */
+        
+        .register-btn {
+            width: 100%;
+            height: 48px;
+            background-color: #2d8cf0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .register-btn:hover {
+            background-color: #1b74d0;
+        }
+        /* 登录链接 */
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        a {
+            color: #2d8cf0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-box">
+        <h2 class="title">用户注册</h2>
+
+        <div class="input-item">
+            <input type="text" id="username" placeholder="请输入账号（学号/工号/商家编号）">
+        </div>
+        <div class="input-item">
+            <input type="password" id="password" placeholder="请输入密码（6位以上）">
+        </div>
+        <div class="input-item">
+            <input type="password" id="confirmPwd" placeholder="确认密码">
+        </div>
+        <div class="input-item">
+            <input type="text" id="phone" placeholder="请输入手机号">
+        </div>
+        <div class="input-item">
+            <input type="email" id="email" placeholder="请输入邮箱">
+        </div>
+
+        <!-- 角色选择：学生/商家/管理员 -->
+        <div class="role-box">
+            <label>
+                <input type="radio" name="role" value="student" checked onclick="toggleKeyBox()"> 学生
+            </label>
+            <label>
+                <input type="radio" name="role" value="merchant" onclick="toggleKeyBox()"> 商家
+            </label>
+            <label>
+                <input type="radio" name="role" value="admin" onclick="toggleKeyBox()"> 管理员
+            </label>
+        </div>
+
+        <!-- 商家授权密钥框（默认隐藏，选中商家显示） -->
+        <div class="input-item" id="merchantKeyBox" style="display: none;">
+            <input type="password" id="merchantAuthKey" placeholder="请输入商家注册授权密钥">
+        </div>
+
+        <!-- 管理员密钥框（默认隐藏，选中管理员显示） -->
+        <div class="input-item" id="adminKeyBox" style="display: none;">
+            <input type="password" id="adminKey" placeholder="请输入管理员注册密钥">
+        </div>
+
+        <button class="register-btn" onclick="register()">立即注册</button>
+        <div class="login-link">
+            已有账号？<a href="login.html">返回登录</a>
+        </div>
+    </div>
+
+    <script>
+        // ===================== 管理员配置密钥（自行修改）=====================
+        const ADMIN_REGISTER_KEY = "admin123"; // 管理员注册密钥
+        const MERCHANT_AUTH_KEY = "shop888"; // 商家注册授权密钥
+        // ==================================================================
+
+        // 核心：切换角色时，显示/隐藏对应密钥框（和管理员完全统一）
+        function toggleKeyBox() {
+            let role = document.querySelector('input[name="role"]:checked').value;
+            let merchantBox = document.getElementById("merchantKeyBox");
+            let adminBox = document.getElementById("adminKeyBox");
+
+            // 选中商家 → 显示商家密钥，隐藏管理员密钥
+            if (role === "merchant") {
+                merchantBox.style.display = "block";
+                adminBox.style.display = "none";
+            }
+            // 选中管理员 → 显示管理员密钥，隐藏商家密钥
+            else if (role === "admin") {
+                adminBox.style.display = "block";
+                merchantBox.style.display = "none";
+            }
+            // 选中学生 → 两个密钥框都隐藏
+            else {
+                merchantBox.style.display = "none";
+                adminBox.style.display = "none";
+            }
+        }
+
+        // 注册主函数
+        function register() {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            let confirmPwd = document.getElementById("confirmPwd").value;
+            let phone = document.getElementById("phone").value;
+            let email = document.getElementById("email").value;
+            let role = document.querySelector('input[name="role"]:checked').value;
+
+            let merchantKey = document.getElementById("merchantAuthKey").value;
+            let adminKey = document.getElementById("adminKey").value;
+
+            // 基础必填项校验
+            if (!username || !password || !confirmPwd || !phone || !email) {
+                alert("请填写所有必填项！");
+                return;
+            }
+            if (password !== confirmPwd) {
+                alert("两次密码不一致！");
+                return;
+            }
+            if (password.length < 6) {
+                alert("密码至少6位！");
+                return;
+            }
+
+            // 权限校验：商家必须输入正确授权密钥
+            if (role === "merchant") {
+                if (!merchantKey || merchantKey !== MERCHANT_AUTH_KEY) {
+                    alert("商家授权密钥错误，请联系管理员！");
+                    return;
+                }
+            }
+
+            // 权限校验：管理员必须输入正确注册密钥
+            if (role === "admin") {
+                if (!adminKey || adminKey !== ADMIN_REGISTER_KEY) {
+                    alert("管理员注册密钥错误！");
+                    return;
+                }
+            }
+
+            // 注册成功，保存用户信息
+            let user = {
+                username: username,
+                password: password,
+                phone: phone,
+                email: email,
+                role: role
+            };
+            localStorage.setItem("user_" + username, JSON.stringify(user));
+
+            alert("注册成功！即将跳转到登录页");
+            location.href = "login.html";
+        }
+    </script>
+</body>
+
+</html>
