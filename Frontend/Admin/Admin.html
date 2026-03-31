@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂餐饮管理系统 - 超级管理中心</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="Admin.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">食堂管理系统</div>
+        <div class="menu-item" onclick="toggleMenu('sysMenu')"><span><i class="fa-solid fa-chart-line"></i> 系统概览</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="sysMenu">
+            <div class="sub-item" onclick="switchPage('dashboard')">数据总览</div>
+            <div class="sub-item" onclick="switchPage('userManage')">全局用户管理</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('merchantMenu')"><span><i class="fa-solid fa-store"></i> 商家管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="merchantMenu">
+            <div class="sub-item" onclick="switchPage('merchantList')">商家基础信息</div>
+            <div class="sub-item" onclick="switchPage('qualificationCheck')">资质审核</div>
+            <div class="sub-item" onclick="switchPage('shopGoods')">门店&菜品管理</div>
+            <div class="sub-item" onclick="switchPage('merchantAccount')">账号权限管理</div>
+            <div class="sub-item" onclick="switchPage('orderMonitor')">运营订单监管</div>
+            <div class="sub-item" onclick="switchPage('commentComplaint')">评价投诉处理</div>
+            <div class="sub-item" onclick="switchPage('dataRisk')">数据与风控管理</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('adminMenu')"><span><i class="fa-solid fa-user-shield"></i> 管理员管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="adminMenu">
+            <div class="sub-item" onclick="switchPage('adminList')">普通管理员列表</div>
+            <div class="sub-item" onclick="switchPage('adminAdd')">新增普通管理员</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('authMenu')"><span><i class="fa-solid fa-key"></i> 授权管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="authMenu">
+            <div class="sub-item" onclick="switchPage('authManage')">授权码生成</div>
+            <div class="sub-item" onclick="switchPage('authRecord')">授权记录查询</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('studentMenu')"><span><i class="fa-solid fa-user-graduate"></i> 学生管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="studentMenu">
+            <div class="sub-item" onclick="switchPage('studentList')">学生信息列表</div>
+            <div class="sub-item" onclick="switchPage('rechargeRecord')">充值记录管理</div>
+            <div class="sub-item" onclick="switchPage('consumeStats')">消费统计分析</div>
+            <div class="sub-item" onclick="switchPage('studentFeedback')">反馈处理</div>
+        </div>
+        <div class="menu-item" onclick="switchPage('profile')" style="margin-top: auto;"><span><i class="fa-solid fa-user"></i> 个人中心</span></div>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle">学生反馈处理</h2>
+            <div class="user-info"><span><i class="fa-solid fa-user-shield"></i> <span id="adminName">超级管理员</span></span><button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> 退出登录</button></div>
+        </div>
+        <div class="content">
+            <div class="page" id="dashboard">
+                <div class="stats-panel">
+                    <div class="stats-card stats-total">
+                        <h3>0</h3>
+                        <p>总商家数</p>
+                    </div>
+                    <div class="stats-card stats-pending">
+                        <h3>0</h3>
+                        <p>待审核商家</p>
+                    </div>
+                    <div class="stats-card stats-pass">
+                        <h3>0</h3>
+                        <p>正常经营商家</p>
+                    </div>
+                    <div class="stats-card stats-freeze">
+                        <h3>0</h3>
+                        <p>已冻结商家</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">商家经营TOP5</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>商家名称</th>
+                                    <th>订单数</th>
+                                    <th>营业额</th>
+                                    <th>评分</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="empty-data">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="userManage">
+                <div class="card">
+                    <div class="card-title">全局用户列表</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>用户ID</th>
+                                    <th>账号</th>
+                                    <th>姓名</th>
+                                    <th>角色</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="empty-data">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="merchantList">
+                <div class="card">
+                    <div class="card-title"><span>商家基础信息</span><button class="btn btn-success" onclick="openEditMerchantModal()"><i class="fa-solid fa-plus"></i> 新增商家</button></div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>商家编号</th>
+                                    <th>6位商家编码</th>
+                                    <th>商家名称</th>
+                                    <th>店面位置</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="merchantTableBody">
+                                <tr>
+                                    <td colspan="5" class="empty-data">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="qualificationCheck">
+                <div class="card">
+                    <div class="card-title">商家资质审核</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>商家编号</th>
+                                    <th>商家名称</th>
+                                    <th>提交时间</th>
+                                    <th>审核状态</th>
+                                    <th>审核人</th>
+                                    <th>审核时间</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" class="empty-data">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="shopGoods">
+                <div class="card">
+                    <div class="card-title">门店&菜品管理</div>
+                    <div class="empty-data">请选择商家</div>
+                </div>
+            </div>
+            <div class="page" id="merchantAccount">
+                <div class="card">
+                    <div class="card-title">商家账号权限管理</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>账号ID</th>
+                                    <th>登录账号</th>
+                                    <th>姓名</th>
+                                    <th>手机号</th>
+                                    <th>权限</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="empty-data">请选择商家</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="orderMonitor">
+                <div class="card">
+                    <div class="card-title">订单监管</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>订单编号</th>
+                                    <th>商家名称</th>
+                                    <th>下单时间</th>
+                                    <th>订单金额</th>
+                                    <th>支付状态</th>
+                                    <th>订单状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="empty-data">请选择商家</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="commentComplaint">
+                <div class="card">
+                    <div class="card-title">评价投诉处理</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>编号</th>
+                                    <th>商家名称</th>
+                                    <th>用户姓名</th>
+                                    <th>类型</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="empty-data">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="dataRisk">
+                <div class="card">
+                    <div class="card-title">数据与风控管理</div>
+                    <div class="empty-data">请选择商家</div>
+                </div>
+            </div>
+            <div class="page" id="profile">
+                <div class="card" style="max-width:600px">
+                    <div class="card-title">个人信息</div>
+                    <div class="modal-form">
+                        <div class="form-item"><label>管理员账号</label><input type="text" disabled value="超级管理员"></div>
+                        <div class="form-item"><label>姓名</label><input type="text" id="profileName" value="超级管理员"></div>
+                        <div class="form-item"><label>手机号</label><input type="tel" id="profilePhone"></div>
+                        <div class="form-item"><label>修改密码</label><input type="password" id="profilePwd" placeholder="不修改请留空"></div>
+                        <div class="modal-footer"><button class="btn btn-primary" onclick="saveProfile()">保存</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="studentList">
+                <div class="card">
+                    <div class="card-title"><span>学生信息列表</span><button class="btn btn-primary" onclick="openModal('addStudentModal')">新增学生</button></div>
+                    <div class="search-filter"><input type="text" class="search-input" placeholder="搜索学号/姓名"><select class="select-input"><option value="all">全部状态</option><option value="normal">正常</option></select></div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>性别</th>
+                                    <th>年级</th>
+                                    <th>余额</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" class="empty-data">暂无学生数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="rechargeRecord">
+                <div class="card">
+                    <div class="card-title">充值记录管理</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>记录ID</th>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>充值金额</th>
+                                    <th>充值时间</th>
+                                    <th>充值方式</th>
+                                    <th>操作人</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" class="empty-data">暂无充值记录</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="consumeStats">
+                <div class="stats-panel">
+                    <div class="stats-card" style="background:#2d8cf0">
+                        <h3>0</h3>
+                        <p>总消费金额</p>
+                    </div>
+                    <div class="stats-card" style="background:#36b36d">
+                        <h3>0</h3>
+                        <p>今日消费次数</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">消费排行</div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>消费金额</th>
+                                    <th>消费次数</th>
+                                    <th>偏好商家</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="empty-data">暂无统计数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="studentFeedback">
+                <div class="card">
+                    <div class="card-title"><span>学生反馈处理</span><button class="btn btn-success" onclick="openAddFeedbackModal()"><i class="fa-solid fa-plus"></i> 新增反馈</button></div>
+                    <div class="search-filter">
+                        <input type="text" id="feedbackSearchInput" class="search-input" placeholder="搜索学生姓名/学号/内容">
+                        <select id="feedbackStatusFilter" class="select-input"><option value="all">全部状态</option><option value="pending">待处理</option><option value="resolved">已处理</option></select>
+                        <button id="searchFeedbackBtn" class="btn btn-primary">查询</button>
+                        <button id="resetFeedbackBtn" class="btn btn-default">重置</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>反馈ID</th>
+                                    <th>学号</th>
+                                    <th>学生姓名</th>
+                                    <th>反馈内容</th>
+                                    <th>提交时间</th>
+                                    <th>状态</th>
+                                    <th>回复内容</th>
+                                    <th>处理人</th>
+                                    <th>处理时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbackTableBody">
+                                <tr>
+                                    <td colspan="10" class="empty-data">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="adminList">
+                <div class="card">
+                    <div class="card-title"><span>普通管理员列表</span><button class="btn btn-success" onclick="openAddAdminModal()"><i class="fa-solid fa-plus"></i> 新增管理员</button></div>
+                    <div class="search-filter"><input type="text" id="adminSearchInput" class="search-input" placeholder="搜索账号/姓名/手机号"><select id="adminStatusFilter" class="select-input"><option value="all">全部状态</option><option value="active">启用</option><option value="disabled">禁用</option></select>
+                        <button id="adminSearchBtn" class="btn btn-primary">查询</button><button id="adminResetBtn" class="btn btn-default">重置</button></div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>账号</th>
+                                    <th>姓名</th>
+                                    <th>手机号</th>
+                                    <th>状态</th>
+                                    <th>权限</th>
+                                    <th>最后登录</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody">
+                                <tr>
+                                    <td colspan="8" class="empty-data">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="adminAdd">
+                <div class="card" style="max-width:600px; text-align:center;">
+                    <div class="card-title">新增普通管理员</div>
+                    <p style="margin:20px 0">请使用列表中的「新增管理员」按钮，或</p><button class="btn btn-primary" onclick="switchPage('adminList'); setTimeout(openAddAdminModal,100);">前往新增</button>
+                </div>
+            </div>
+            <div class="page" id="authManage">
+                <div class="card">
+                    <div class="card-title">授权码生成管理</div>
+                    <div class="auth-tab">
+                        <div class="auth-tab-item active" onclick="switchAuthTab(event, 'merchantAuth')">商家授权码</div>
+                        <div class="auth-tab-item" onclick="switchAuthTab(event, 'adminAuth')">管理员注册码</div>
+                    </div>
+                    <div class="auth-content active" id="merchantAuth">
+                        <div class="card" style="margin-bottom:15px">
+                            <div class="card-title">新增商家授权信息</div>
+                            <div class="modal-form">
+                                <div class="form-item"><label>商家编号 <span style="color:red">*</span></label><input type="text" id="newMerchantId" placeholder="请输入商家编号"></div>
+                                <div class="form-item"><label>6位商家编码 <span style="color:red">*</span></label><input type="text" id="newMerchantCode" placeholder="6位数字编码"></div>
+                                <div class="form-item"><label>商家名称 <span style="color:red">*</span></label><input type="text" id="newMerchantName" placeholder="请输入商家名称"></div>
+                                <div class="form-item"><label>授权有效期（天）</label><input type="number" id="merchantAuthExpireDays" value="30"></div>
+                                <div class="modal-footer"><button class="btn btn-primary" onclick="generateMerchantAuthCode()">生成商家授权码</button></div>
+                            </div>
+                        </div>
+                        <div class="auth-code-container" id="merchantAuthCodeContainer" style="display:none">
+                            <div class="auth-code-info">
+                                <div id="merchantAuthCodeMerchant"></div>
+                                <div class="auth-code-text" id="merchantAuthCodeText"></div>
+                                <div class="auth-code-expire" id="merchantAuthCodeExpire"></div>
+                            </div><button class="btn btn-default" onclick="copyAuthCode('merchantAuthCodeText')"><i class="fa-solid fa-copy"></i> 复制授权码</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>商家编号</th>
+                                        <th>6位商家编码</th>
+                                        <th>商家名称</th>
+                                        <th>授权码</th>
+                                        <th>状态</th>
+                                        <th>过期时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="merchantAuthTableBody">
+                                    <tr>
+                                        <td colspan="7" class="empty-data">暂无商家授权码数据</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="auth-content" id="adminAuth">
+                        <div class="card" style="margin-bottom:15px">
+                            <div class="card-title">新增管理员注册信息</div>
+                            <div class="modal-form">
+                                <div class="form-item"><label>管理员ID <span style="color:red">*</span></label><input type="text" id="newAdminId" placeholder="请输入管理员ID"></div>
+                                <div class="form-item"><label>管理员账号 <span style="color:red">*</span></label><input type="text" id="newAdminAccount" placeholder="请输入登录账号"></div>
+                                <div class="form-item"><label>管理员姓名 <span style="color:red">*</span></label><input type="text" id="newAdminName" placeholder="请输入管理员姓名"></div>
+                                <div class="form-item"><label>手机号 <span style="color:red">*</span></label><input type="tel" id="newAdminPhone" placeholder="请输入手机号"></div>
+                                <div class="form-item"><label>注册码有效期（天）</label><input type="number" id="adminAuthExpireDays" value="7"></div>
+                                <div class="modal-footer"><button class="btn btn-primary" onclick="generateAdminAuthCode()">生成管理员注册码</button></div>
+                            </div>
+                        </div>
+                        <div class="auth-code-container" id="adminAuthCodeContainer" style="display:none">
+                            <div class="auth-code-info">
+                                <div id="adminAuthCodeAdmin"></div>
+                                <div class="auth-code-text" id="adminAuthCodeText"></div>
+                                <div class="auth-code-expire" id="adminAuthCodeExpire"></div>
+                            </div><button class="btn btn-default" onclick="copyAuthCode('adminAuthCodeText')"><i class="fa-solid fa-copy"></i> 复制注册码</button>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>管理员ID</th>
+                                        <th>账号</th>
+                                        <th>姓名</th>
+                                        <th>注册码</th>
+                                        <th>状态</th>
+                                        <th>过期时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminAuthTableBody">
+                                    <tr>
+                                        <td colspan="7" class="empty-data">暂无管理员注册码数据</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="authRecord">
+                <div class="card">
+                    <div class="card-title">授权记录查询</div>
+                    <div class="search-filter"><select class="select-input" id="authRecordType"><option value="all">全部授权类型</option><option value="merchant">商家授权码</option><option value="admin">管理员注册码</option></select><input type="text" class="search-input" id="authRecordSearchInput"
+                            placeholder="搜索授权码/商家/管理员信息"><button class="btn btn-primary" id="searchAuthRecordBtn">查询</button></div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>授权类型</th>
+                                    <th>关联主体</th>
+                                    <th>授权码/注册码</th>
+                                    <th>生成时间</th>
+                                    <th>过期时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="authRecordTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-data">暂无授权记录</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal-mask" id="addFeedbackModal">
+        <div class="modal-box">
+            <div class="modal-title"><span>新增学生反馈</span><button class="btn btn-default btn-sm" onclick="closeModal('addFeedbackModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="modal-form">
+                <div class="form-item"><label>学号 *</label><input type="text" id="fbStudentId" placeholder="学号"></div>
+                <div class="form-item"><label>学生姓名 *</label><input type="text" id="fbStudentName" placeholder="姓名"></div>
+                <div class="form-item"><label>反馈内容 *</label><textarea id="fbContent" rows="3" placeholder="请详细描述问题或建议"></textarea></div>
+                <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('addFeedbackModal')">取消</button><button class="btn btn-primary" onclick="saveNewFeedback()">提交反馈</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-mask" id="replyFeedbackModal">
+        <div class="modal-box">
+            <div class="modal-title"><span>回复反馈</span><button class="btn btn-default btn-sm" onclick="closeModal('replyFeedbackModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="modal-form">
+                <div class="form-item"><label>原反馈内容</label>
+                    <div id="originalFeedbackContent" style="background:#f5f7fa; padding:10px; border-radius:6px; font-size:13px; color:#333;"></div>
+                </div>
+                <div class="form-item"><label>回复内容 *</label><textarea id="replyContentInput" rows="3" placeholder="请输入回复内容..."></textarea></div><input type="hidden" id="replyFeedbackId">
+                <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('replyFeedbackModal')">取消</button><button class="btn btn-primary" onclick="saveFeedbackReply()">确认回复</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-mask" id="adminModal">
+        <div class="modal-box">
+            <div class="modal-title"><span id="modalTitle">新增管理员</span><button class="btn btn-default btn-sm" onclick="closeModal('adminModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <form id="adminForm" onsubmit="return false;"><input type="hidden" id="editId">
+                <div class="modal-form">
+                    <div class="form-item"><label>账号 *</label><input type="text" id="account" autocomplete="off"></div>
+                    <div class="form-item"><label>姓名 *</label><input type="text" id="fullname"></div>
+                    <div class="form-item"><label>手机号 *</label><input type="tel" id="mobile"></div>
+                    <div class="form-item"><label>状态</label><select id="statusSelect"><option value="active">启用</option><option value="disabled">禁用</option></select></div>
+                    <div class="form-item"><label>权限</label>
+                        <div id="permissionsGroup" class="checkbox-group"></div>
+                        <div class="info-text" id="permHint">禁用账号时权限自动清空</div>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('adminModal')">取消</button><button type="submit" class="btn btn-primary">保存</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-mask" id="editMerchantModal">
+        <div class="modal-box">
+            <div class="modal-title"><span>新增商家</span><button class="btn btn-default btn-sm" onclick="closeModal('editMerchantModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="modal-form">
+                <div class="form-item"><label>商家名称 *</label><input type="text" id="merchantName"></div>
+                <div class="form-item"><label>6位商家编码 *</label><input type="text" id="merchantCode"></div>
+                <div class="form-item"><label>店面位置</label><input type="text" id="merchantAddress"></div>
+                <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('editMerchantModal')">取消</button><button class="btn btn-primary" onclick="saveMerchant()">保存</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-mask" id="addStudentModal">
+        <div class="modal-box">
+            <div class="modal-title"><span>新增学生</span><button class="btn btn-default btn-sm" onclick="closeModal('addStudentModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="modal-form">
+                <div class="form-item"><label>学号 *</label><input type="text" id="studentNo"></div>
+                <div class="form-item"><label>姓名 *</label><input type="text" id="studentName"></div>
+                <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('addStudentModal')">取消</button><button class="btn btn-primary" onclick="saveStudent()">保存</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Admin.js"></script>
+</body>
+
+</html>

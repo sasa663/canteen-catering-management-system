@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂餐饮管理系统 - 商家端</title>
+    <link rel="stylesheet" href="Merchant.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- 授权验证弹窗（首次登录显示） -->
+    <div class="modal-mask" id="authModal" style="display: flex;">
+        <div class="modal-box">
+            <div class="modal-title">商家授权验证</div>
+            <div class="modal-form">
+                <div class="form-item">
+                    <label>请输入管理端生成的授权码</label>
+                    <input type="text" id="authCodeInput" placeholder="8位字母/数字授权码" maxlength="8">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" onclick="closeAuthModal()">取消</button>
+                    <button class="btn btn-primary" onclick="verifyAuthCode()">验证授权</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">商家管理中心</div>
+
+        <!-- 数据概览 -->
+        <div class="menu-item" onclick="toggleMenu('dataMenu')">
+            <span><i class="fa-solid fa-chart-line"></i> 数据概览</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="dataMenu">
+            <div class="sub-item active" onclick="switchPage('dashboard')">营业数据</div>
+            <div class="sub-item" onclick="switchPage('orderStats')">订单统计</div>
+        </div>
+
+        <!-- 菜品管理 -->
+        <div class="menu-item" onclick="toggleMenu('goodsMenu')">
+            <span><i class="fa-solid fa-utensils"></i> 菜品管理</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="goodsMenu">
+            <div class="sub-item" onclick="switchPage('goodsList')">菜品列表</div>
+            <div class="sub-item" onclick="switchPage('addGoods')">新增菜品</div>
+        </div>
+
+        <!-- 订单管理 -->
+        <div class="menu-item" onclick="toggleMenu('orderMenu')">
+            <span><i class="fa-solid fa-receipt"></i> 订单管理</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="orderMenu">
+            <div class="sub-item" onclick="switchPage('pendingOrder')">待处理订单</div>
+            <div class="sub-item" onclick="switchPage('finishedOrder')">已完成订单</div>
+            <div class="sub-item" onclick="switchPage('canceledOrder')">已取消订单</div>
+        </div>
+
+        <!-- 新增：商家信息 -->
+        <div class="menu-item" onclick="switchPage('merchantInfo')">
+            <span><i class="fa-solid fa-building"></i> 商家信息</span>
+        </div>
+
+        <!-- 新增：资质审核 -->
+        <div class="menu-item" onclick="switchPage('qualification')">
+            <span><i class="fa-solid fa-id-card"></i> 资质审核</span>
+        </div>
+
+        <!-- 新增：账号权限 -->
+        <div class="menu-item" onclick="switchPage('accountSecurity')">
+            <span><i class="fa-solid fa-key"></i> 账号权限</span>
+        </div>
+
+        <!-- 新增：评价投诉 -->
+        <div class="menu-item" onclick="toggleMenu('reviewMenu')">
+            <span><i class="fa-solid fa-star-of-life"></i> 评价投诉</span>
+            <span><i class="fa-solid fa-chevron-down"></i></span>
+        </div>
+        <div class="sub-menu" id="reviewMenu">
+            <div class="sub-item" onclick="switchPage('reviewList')">用户评价</div>
+            <div class="sub-item" onclick="switchPage('complaintList')">投诉处理</div>
+        </div>
+
+        <!-- 店铺设置（原） -->
+        <div class="menu-item" onclick="switchPage('shopSetting')" style="margin-top: auto;">
+            <span><i class="fa-solid fa-gear"></i> 店铺设置</span>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle">营业数据</h2>
+            <div class="user-info">
+                <span><i class="fa-solid fa-store"></i> <span id="shopName">未授权商家</span></span>
+                <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> 退出登录</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 营业数据概览 -->
+            <div class="page active" id="dashboard">
+                <div class="stats-panel">
+                    <div class="stats-card stats-total">
+                        <h3>¥0</h3>
+                        <p>今日营业额</p>
+                    </div>
+                    <div class="stats-card stats-success">
+                        <h3>0</h3>
+                        <p>今日订单数</p>
+                    </div>
+                    <div class="stats-card stats-warning">
+                        <h3>0</h3>
+                        <p>待处理订单</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="createTestOrder()" style="margin-bottom:20px;">
+                    <i class="fa-solid fa-plus"></i> 模拟下单（测试菜品数量/库存联动）
+                </button>
+                <div class="card">
+                    <div class="card-title">热销菜品TOP5</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>菜品名称</th>
+                                <th>销量</th>
+                                <th>销售额</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topGoodsBody">
+                            <tr>
+                                <td colspan="4" class="empty-data">暂无销售数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 订单统计 -->
+            <div class="page" id="orderStats">
+                <div class="card">
+                    <div class="card-title">订单统计</div>
+                    <div class="search-filter">
+                        <select class="select-input" id="orderStatsType">
+                            <option value="today">今日</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
+                        </select>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>订单数</th>
+                                <th>营业额</th>
+                                <th>客单价</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderStatsBody">
+                            <tr>
+                                <td colspan="4" class="empty-data">暂无统计数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 菜品列表 -->
+            <div class="page" id="goodsList">
+                <div class="card">
+                    <div class="card-title">
+                        <span>菜品列表</span>
+                        <button class="btn btn-primary" onclick="switchPage('addGoods')">新增菜品</button>
+                    </div>
+                    <div class="search-filter">
+                        <input type="text" class="search-input" id="goodsSearch" placeholder="搜索菜品名称">
+                        <select class="select-input" id="goodsStatusFilter">
+                            <option value="all">全部状态</option>
+                            <option value="on">上架中</option>
+                            <option value="off">已下架</option>
+                        </select>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>菜品名称</th>
+                                <th>分类</th>
+                                <th>价格</th>
+                                <th>库存</th>
+                                <th>销量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="goodsTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-data">暂无菜品数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 新增菜品 -->
+            <div class="page" id="addGoods">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">新增菜品</div>
+                    <div class="modal-form">
+                        <div class="form-item">
+                            <label>菜品名称</label>
+                            <input type="text" id="goodsName" placeholder="请输入菜品名称">
+                        </div>
+                        <div class="form-item">
+                            <label>菜品分类</label>
+                            <select id="goodsType">
+                                <option value="">请选择分类</option>
+                                <option value="hot">热菜</option>
+                                <option value="cold">凉菜</option>
+                                <option value="soup">汤品</option>
+                                <option value="rice">主食</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label>菜品价格</label>
+                            <input type="number" id="goodsPrice" placeholder="请输入菜品价格" min="0" step="0.01">
+                        </div>
+                        <div class="form-item">
+                            <label>库存数量</label>
+                            <input type="number" id="goodsStock" placeholder="请输入菜品库存" min="0" value="0">
+                        </div>
+                        <div class="form-item">
+                            <label>菜品图片</label>
+                            <input type="file" accept="image/*">
+                        </div>
+                        <div class="form-item">
+                            <label>菜品描述</label>
+                            <textarea id="goodsDesc" placeholder="请输入菜品描述"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-default" onclick="switchPage('goodsList')">取消</button>
+                            <button class="btn btn-primary" onclick="saveGoods()">保存菜品</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 待处理订单 -->
+            <div class="page" id="pendingOrder">
+                <div class="card">
+                    <div class="card-title">待处理订单</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单编号</th>
+                                <th>下单时间</th>
+                                <th>菜品</th>
+                                <th>菜品数量</th>
+                                <th>金额</th>
+                                <th>支付状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingOrderTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-data">暂无待处理订单</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 已完成订单 -->
+            <div class="page" id="finishedOrder">
+                <div class="card">
+                    <div class="card-title">已完成订单</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单编号</th>
+                                <th>下单时间</th>
+                                <th>菜品</th>
+                                <th>菜品数量</th>
+                                <th>金额</th>
+                                <th>完成时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finishedOrderTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-data">暂无已完成订单</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 已取消订单 -->
+            <div class="page" id="canceledOrder">
+                <div class="card">
+                    <div class="card-title">已取消订单</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单编号</th>
+                                <th>下单时间</th>
+                                <th>菜品</th>
+                                <th>菜品数量</th>
+                                <th>金额</th>
+                                <th>取消原因</th>
+                            </tr>
+                        </thead>
+                        <tbody id="canceledOrderTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-data">暂无已取消订单</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 店铺设置（原） -->
+            <div class="page" id="shopSetting">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">店铺基础设置</div>
+                    <div class="modal-form">
+                        <div class="form-item">
+                            <label>店铺名称</label>
+                            <input type="text" id="shopNameInput" placeholder="请输入店铺名称">
+                        </div>
+                        <div class="form-item">
+                            <label>营业状态</label>
+                            <select id="businessStatus">
+                                <option value="open">营业中</option>
+                                <option value="close">暂停营业</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label>营业时间段</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="time" id="startTime" placeholder="开始时间">
+                                <input type="time" id="endTime" placeholder="结束时间">
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label>店铺地址</label>
+                            <textarea id="shopAddress" placeholder="请输入店铺详细地址"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="saveShopSetting()">保存设置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增：商家信息 -->
+            <div class="page" id="merchantInfo">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">商家基础信息</div>
+                    <div class="modal-form">
+                        <div class="form-item">
+                            <label>店铺名称</label>
+                            <input type="text" id="merchantShopName" placeholder="店铺名称">
+                        </div>
+                        <div class="form-item">
+                            <label>联系人姓名</label>
+                            <input type="text" id="merchantContact" placeholder="联系人">
+                        </div>
+                        <div class="form-item">
+                            <label>联系电话</label>
+                            <input type="text" id="merchantPhone" placeholder="联系电话">
+                        </div>
+                        <div class="form-item">
+                            <label>电子邮箱</label>
+                            <input type="email" id="merchantEmail" placeholder="电子邮箱">
+                        </div>
+                        <div class="form-item">
+                            <label>详细地址</label>
+                            <textarea id="merchantAddress" rows="2" placeholder="详细地址"></textarea>
+                        </div>
+                        <div class="form-item">
+                            <label>营业时间</label>
+                            <input type="text" id="merchantHours" placeholder="例如：10:00-21:00">
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="saveMerchantInfo()">保存信息</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增：资质审核 -->
+            <div class="page" id="qualification">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">资质审核</div>
+                    <div class="modal-form">
+                        <div class="form-item">
+                            <label>审核状态</label>
+                            <span id="qualificationStatus" class="badge">未提交</span>
+                        </div>
+                        <div class="form-item">
+                            <label>营业执照（图片链接）</label>
+                            <input type="text" id="licenseUrl" placeholder="请输入营业执照图片URL">
+                        </div>
+                        <div class="form-item">
+                            <label>食品经营许可证（图片链接）</label>
+                            <input type="text" id="foodLicenseUrl" placeholder="请输入许可证图片URL">
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="submitQualification()">提交审核</button>
+                        </div>
+                        <p style="font-size:12px; color:#999; margin-top:10px;">提交后请等待管理端审核，审核状态会在此更新。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增：账号权限 -->
+            <div class="page" id="accountSecurity">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-title">账号权限管理</div>
+                    <div class="modal-form">
+                        <div class="form-item">
+                            <label>当前账号</label>
+                            <input type="text" value="merchant_admin" disabled>
+                        </div>
+                        <div class="form-item">
+                            <label>修改密码</label>
+                            <input type="password" id="oldPassword" placeholder="原密码">
+                        </div>
+                        <div class="form-item">
+                            <label>新密码</label>
+                            <input type="password" id="newPassword" placeholder="新密码">
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" onclick="changePassword()">更新密码</button>
+                        </div>
+                        <div class="form-item">
+                            <label>权限说明</label>
+                            <p style="font-size:13px; color:#666;">当前角色：商家管理员。拥有菜品管理、订单处理、评价回复、投诉处理、店铺设置等全部权限。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增：用户评价 -->
+            <div class="page" id="reviewList">
+                <div class="card">
+                    <div class="card-title">用户评价管理</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>用户</th>
+                                <th>评分</th>
+                                <th>评价内容</th>
+                                <th>商家回复</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-data">暂无评价</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 新增：投诉处理 -->
+            <div class="page" id="complaintList">
+                <div class="card">
+                    <div class="card-title">投诉建议处理</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>投诉人</th>
+                                <th>投诉内容</th>
+                                <th>状态</th>
+                                <th>商家回复</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="complaintTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-data">暂无投诉</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Merchant.js"></script>
+</body>
+
+</html>

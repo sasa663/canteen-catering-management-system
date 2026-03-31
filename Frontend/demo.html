@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>智慧食堂 - 学生端 | 食堂·店铺·类别点餐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f4f7fc;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1e6f3f 0%, #0f4d2d 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+        }
+        
+        .sidebar-header {
+            padding: 24px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .sidebar-header i {
+            margin-right: 8px;
+        }
+        
+        .menu-item {
+            padding: 14px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .menu-item.active,
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid #ffcd3c;
+        }
+        
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            background: #f0f2f5;
+        }
+        
+        .header {
+            background: white;
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .balance-badge {
+            background: #f5a623;
+            padding: 6px 14px;
+            border-radius: 32px;
+            color: #2c3e2f;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: #e67e22;
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 28px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background: #d35400;
+        }
+        
+        .content {
+            padding: 24px 28px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e2f3a;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #eef2f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2c7a4d;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1f5f3a;
+        }
+        
+        .btn-success {
+            background: #2c7a4d;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #e67e22;
+            color: white;
+        }
+        
+        .btn-default {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .level-filter {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            padding: 16px 20px;
+            border-radius: 48px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fc;
+            padding: 4px 16px;
+            border-radius: 48px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            color: #2d6a4f;
+            font-size: 14px;
+        }
+        
+        .level-select {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 110px;
+        }
+        
+        .search-input-level {
+            flex: 2;
+            min-width: 200px;
+            padding: 10px 16px;
+            border-radius: 40px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        
+        .breadcrumb {
+            font-size: 13px;
+            background: #eef2f0;
+            padding: 6px 16px;
+            border-radius: 32px;
+            color: #2c6e49;
+        }
+        
+        .goods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 22px;
+        }
+        
+        .goods-card {
+            background: white;
+            border-radius: 28px;
+            padding: 18px;
+            transition: all 0.2s;
+            border: 1px solid #eef2f8;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        
+        .goods-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .goods-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .goods-price {
+            color: #e67e22;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0 6px;
+        }
+        
+        .goods-stock {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 14px;
+        }
+        
+        .cart-badge {
+            background-color: #e67e22;
+            color: white;
+            border-radius: 30px;
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-left: 6px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #edf2f7;
+        }
+        
+        .tag-pending {
+            background: #f39c12;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .tag-finish {
+            background: #2ecc71;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .tag-cancel {
+            background: #95a5a6;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-mask.active {
+            display: flex;
+        }
+        
+        .modal-box {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 480px;
+            padding: 28px;
+        }
+        
+        .form-item {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-item input,
+        .form-item select,
+        .form-item textarea {
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .empty-data {
+            text-align: center;
+            padding: 48px;
+            color: #8d9aa8;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header"><i class="fa-solid fa-utensils"></i> 智慧食堂·学生</div>
+        <div class="menu-item active" onclick="switchPage('menuPage')"><i class="fa-solid fa-store"></i> 点餐大厅</div>
+        <div class="menu-item" onclick="switchPage('cartPage')"><i class="fa-solid fa-cart-shopping"></i> 购物车 <span id="cartCountBadge" class="cart-badge" style="display:none;">0</span></div>
+        <div class="menu-item" onclick="switchPage('myOrders')"><i class="fa-solid fa-list"></i> 我的订单</div>
+        <div class="menu-item" onclick="switchPage('rechargePage')"><i class="fa-solid fa-coins"></i> 充值中心</div>
+        <div class="menu-item" onclick="switchPage('consumeHistory')"><i class="fa-solid fa-chart-line"></i> 消费记录</div>
+        <div class="menu-item" onclick="switchPage('evaluatePage')"><i class="fa-solid fa-star"></i> 评价投诉</div>
+        <div class="menu-item" onclick="switchPage('profilePage')" style="margin-top: auto;"><i class="fa-solid fa-user"></i> 个人中心</div>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle"><i class="fa-solid fa-utensil-spoon"></i> 点餐大厅</h2>
+            <div class="user-info">
+                <span><i class="fa-solid fa-user-graduate"></i> <span id="studentName">加载中</span></span>
+                <span class="balance-badge"><i class="fa-solid fa-wallet"></i> ¥<span id="studentBalance">0.00</span></span>
+                <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> 切换账号</button>
+            </div>
+        </div>
+        <div class="content">
+            <!-- 点餐大厅（四级筛选） -->
+            <div class="page active" id="menuPage">
+                <div class="level-filter">
+                    <div class="filter-group"><i class="fa-solid fa-building"></i><label>食堂</label>
+                        <select id="canteenSelect" class="level-select"></select>
+                    </div>
+                    <div class="filter-group"><i class="fa-solid fa-shop"></i><label>店铺</label>
+                        <select id="storeSelect" class="level-select"></select>
+                    </div>
+                    <div class="filter-group"><i class="fa-solid fa-utensils"></i><label>美食类别</label>
+                        <select id="categorySelectLevel" class="level-select">
+                        <option value="all">全部类别</option>
+                        <option value="hot">热菜</option>
+                        <option value="cold">凉菜</option>
+                        <option value="soup">汤品</option>
+                        <option value="rice">主食</option>
+                    </select>
+                    </div>
+                    <div style="flex:1; min-width:180px;">
+                        <input type="text" id="goodsSearchLevel" class="search-input-level" placeholder="🔍 搜索菜品名称...">
+                    </div>
+                    <div class="breadcrumb" id="locationBreadcrumb"><i class="fa-regular fa-compass"></i> 全部食堂 → 全部店铺</div>
+                </div>
+                <div class="goods-grid" id="goodsGrid"></div>
+            </div>
+
+            <!-- 购物车等其他页面（结构同前，略） -->
+            <div class="page" id="cartPage">
+                <div class="card">
+                    <div class="card-title">购物车</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>菜品</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>小计</th>
+                                <th>操作</th>
+                        </thead>
+                        <tbody id="cartTableBody"></tbody>
+                    </table>
+                    <div style="text-align:right; margin-top:20px;"><strong>总计: ¥<span id="cartTotal">0</span></strong><button class="btn btn-success" style="margin-left:15px;" onclick="submitOrder()">去结算</button></div>
+                </div>
+            </div>
+            <div class="page" id="myOrders">
+                <div class="card">
+                    <div class="card-title">订单列表</div><select class="select-input" id="orderStatusFilter" onchange="renderMyOrders()"><option value="all">全部</option><option value="pending">待处理</option><option value="finished">已完成</option><option value="canceled">已取消</option></select>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>下单时间</th>
+                                <th>菜品</th>
+                                <th>数量</th>
+                                <th>总金额</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                        </thead>
+                        <tbody id="myOrdersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="page" id="rechargePage">
+                <div class="card">
+                    <div class="card-title">账户充值</div>
+                    <div style="font-size:24px; margin-bottom:20px;">当前余额: ¥<span id="balanceDisplay">0.00</span></div>
+                    <div class="form-item"><label>充值金额</label><input type="number" id="rechargeAmount" placeholder="请输入金额" min="1" step="1"></div><button class="btn btn-primary" onclick="recharge()">立即充值</button></div>
+                <div class="card">
+                    <div class="card-title">充值记录</div>
+                    <table class="table">
+                        <thead>运转
+                            <th>时间</th>
+                            <th>金额</th>
+                            <th>方式</th>
+                        </thead>
+                        <tbody id="rechargeHistoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="page" id="consumeHistory">
+                <div class="card">
+                    <div class="card-title">消费明细</div>
+                    <table class="table">
+                        <thead>运转
+                            <th>订单号</th>
+                            <th>时间</th>
+                            <th>消费金额</th>
+                            <th>菜品</th>
+                        </thead>
+                        <tbody id="consumeRecordBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="page" id="evaluatePage">
+                <div class="card">
+                    <div class="card-title">待评价订单</div>
+                    <table class="table">
+                        <thead>运转
+                            <th>订单号</th>
+                            <th>菜品</th>
+                            <th>金额</th>
+                            <th>操作</th>
+                        </thead>
+                        <tbody id="canEvaluateOrders"></tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title">我的投诉建议</div><button class="btn btn-warning" onclick="openComplaintModal()">+ 新增投诉</button>
+                    <table class="table">
+                        <thead>运转
+                            <th>投诉内容</th>
+                            <th>状态</th>
+                            <th>回复</th>
+                        </thead>
+                        <tbody id="myComplaintsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="page" id="profilePage">
+                <div class="card">
+                    <div class="card-title">个人信息</div>
+                    <div class="modal-form">
+                        <div class="form-item"><label>学号</label><input type="text" id="studentId" disabled></div>
+                        <div class="form-item"><label>姓名</label><input type="text" id="profileName"></div>
+                        <div class="form-item"><label>手机号</label><input type="text" id="profilePhone"></div>
+                        <div class="modal-footer"><button class="btn btn-primary" onclick="updateProfile()">保存修改</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评价/投诉弹窗 -->
+    <div class="modal-mask" id="reviewModal">
+        <div class="modal-box">
+            <div class="modal-title">评价订单</div>
+            <div class="modal-form"><input type="hidden" id="reviewOrderId">
+                <div class="form-item"><label>评分</label><select id="ratingScore"><option value="5">★★★★★ 5分</option><option value="4">★★★★☆ 4分</option><option value="3">★★★☆☆ 3分</option><option value="2">★★☆☆☆ 2分</option><option value="1">★☆☆☆☆ 1分</option></select></div>
+                <div class="form-item"><label>评价内容</label><textarea id="reviewContent" rows="3" placeholder="分享用餐体验~"></textarea></div>
+                <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('reviewModal')">取消</button><button class="btn btn-primary" onclick="submitReview()">提交评价</button></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-mask" id="complaintModal">
+        <div class="modal-box">
+            <div class="modal-title">提交投诉建议</div>
+            <div class="modal-form">
+                <div class="form-item"><label>投诉内容</label><textarea id="complaintContent" rows="4" placeholder="请详细描述问题..."></textarea></div>
+                <div class="modal-footer"><button class="btn btn-default" onclick="closeModal('complaintModal')">取消</button><button class="btn btn-primary" onclick="submitComplaint()">提交</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 存储Key ----------
+        var STORAGE_KEYS = {
+            GOODS: 'goodsList',
+            PENDING_ORDERS: 'pendingOrderList',
+            FINISHED_ORDERS: 'finishedOrderList',
+            CANCELED_ORDERS: 'canceledOrderList',
+            REVIEWS: 'reviewsList',
+            COMPLAINTS: 'complaintsList',
+            STUDENTS: 'canteen_students',
+            RECHARGE_RECORDS: 'rechargeRecords',
+            CONSUME_RECORDS: 'consumeRecords',
+            CANTEENS: 'canteens_data',
+            STORES: 'stores_data'
+        };
+        var currentStudent = null;
+        var cart = [];
+
+        // 初始化层级数据
+        function initHierarchyData() {
+            if (!localStorage.getItem(STORAGE_KEYS.CANTEENS)) {
+                localStorage.setItem(STORAGE_KEYS.CANTEENS, JSON.stringify([{
+                    id: 1,
+                    name: "第一食堂"
+                }, {
+                    id: 2,
+                    name: "第二食堂"
+                }]));
+            }
+            if (!localStorage.getItem(STORAGE_KEYS.STORES)) {
+                localStorage.setItem(STORAGE_KEYS.STORES, JSON.stringify([{
+                    id: 1,
+                    name: "🌶️ 川湘风味",
+                    canteenId: 1
+                }, {
+                    id: 2,
+                    name: "🍚 营养快餐",
+                    canteenId: 1
+                }, {
+                    id: 3,
+                    name: "🍜 面点王",
+                    canteenId: 2
+                }, {
+                    id: 4,
+                    name: "🥗 轻食简餐",
+                    canteenId: 2
+                }]));
+            }
+            if (!localStorage.getItem(STORAGE_KEYS.GOODS) || JSON.parse(localStorage.getItem(STORAGE_KEYS.GOODS)).length === 0) {
+                var initGoods = [{
+                    id: 1001,
+                    name: '红烧肉',
+                    type: 'hot',
+                    price: 28.00,
+                    stock: 45,
+                    sales: 68,
+                    status: 'on',
+                    canteenId: 1,
+                    storeId: 1
+                }, {
+                    id: 1002,
+                    name: '酸辣土豆丝',
+                    type: 'hot',
+                    price: 12.00,
+                    stock: 38,
+                    sales: 92,
+                    status: 'on',
+                    canteenId: 1,
+                    storeId: 2
+                }, {
+                    id: 1003,
+                    name: '番茄蛋汤',
+                    type: 'soup',
+                    price: 8.00,
+                    stock: 25,
+                    sales: 44,
+                    status: 'on',
+                    canteenId: 2,
+                    storeId: 3
+                }, {
+                    id: 1004,
+                    name: '宫保鸡丁',
+                    type: 'hot',
+                    price: 26.00,
+                    stock: 30,
+                    sales: 55,
+                    status: 'on',
+                    canteenId: 1,
+                    storeId: 1
+                }, {
+                    id: 1005,
+                    name: '香菇滑鸡饭',
+                    type: 'rice',
+                    price: 18.00,
+                    stock: 22,
+                    sales: 70,
+                    status: 'on',
+                    canteenId: 1,
+                    storeId: 2
+                }, {
+                    id: 1006,
+                    name: '牛肉拉面',
+                    type: 'rice',
+                    price: 22.00,
+                    stock: 18,
+                    sales: 88,
+                    status: 'on',
+                    canteenId: 2,
+                    storeId: 3
+                }, {
+                    id: 1007,
+                    name: '蔬菜沙拉',
+                    type: 'cold',
+                    price: 15.00,
+                    stock: 20,
+                    sales: 33,
+                    status: 'on',
+                    canteenId: 2,
+                    storeId: 4
+                }, {
+                    id: 1008,
+                    name: '酸菜鱼',
+                    type: 'hot',
+                    price: 35.00,
+                    stock: 15,
+                    sales: 42,
+                    status: 'on',
+                    canteenId: 1,
+                    storeId: 1
+                }];
+                localStorage.setItem(STORAGE_KEYS.GOODS, JSON.stringify(initGoods));
+            } else {
+                // 兼容旧数据：确保每个菜品都有canteenId和storeId
+                var goods = JSON.parse(localStorage.getItem(STORAGE_KEYS.GOODS));
+                var needUpdate = false;
+                for (var i = 0; i < goods.length; i++) {
+                    if (goods[i].canteenId === undefined) {
+                        goods[i].canteenId = 1;
+                        needUpdate = true;
+                    }
+                    if (goods[i].storeId === undefined) {
+                        goods[i].storeId = 1;
+                        needUpdate = true;
+                    }
+                }
+                if (needUpdate) localStorage.setItem(STORAGE_KEYS.GOODS, JSON.stringify(goods));
+            }
+        }
+
+        function getCanteens() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.CANTEENS)) || [];
+        }
+
+        function getStores() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.STORES)) || [];
+        }
+
+        function getGoodsList() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.GOODS)) || [];
+        }
+
+        function saveGoodsList(list) {
+            localStorage.setItem(STORAGE_KEYS.GOODS, JSON.stringify(list));
+        }
+
+        function getStudents() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.STUDENTS)) || [];
+        }
+
+        function saveStudents(students) {
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+        }
+
+        function getPendingOrders() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.PENDING_ORDERS)) || [];
+        }
+
+        function getFinishedOrders() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.FINISHED_ORDERS)) || [];
+        }
+
+        function getCanceledOrders() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.CANCELED_ORDERS)) || [];
+        }
+
+        function savePendingOrders(orders) {
+            localStorage.setItem(STORAGE_KEYS.PENDING_ORDERS, JSON.stringify(orders));
+        }
+
+        function saveFinishedOrders(orders) {
+            localStorage.setItem(STORAGE_KEYS.FINISHED_ORDERS, JSON.stringify(orders));
+        }
+
+        function saveCanceledOrders(orders) {
+            localStorage.setItem(STORAGE_KEYS.CANCELED_ORDERS, JSON.stringify(orders));
+        }
+
+        function loadCurrentStudent() {
+            var storedId = localStorage.getItem('currentStudentId');
+            var students = getStudents();
+            if (storedId) {
+                for (var i = 0; i < students.length; i++) {
+                    if (students[i].studentId === storedId) {
+                        currentStudent = students[i];
+                        break;
+                    }
+                }
+            }
+            if (!currentStudent && students.length) currentStudent = students[0];
+            if (currentStudent) {
+                localStorage.setItem('currentStudentId', currentStudent.studentId);
+                document.getElementById('studentName').innerText = currentStudent.name;
+                document.getElementById('studentBalance').innerText = currentStudent.balance.toFixed(2);
+                document.getElementById('balanceDisplay').innerText = currentStudent.balance.toFixed(2);
+                document.getElementById('studentId').value = currentStudent.studentId;
+                document.getElementById('profileName').value = currentStudent.name;
+                document.getElementById('profilePhone').value = currentStudent.phone || '';
+            }
+        }
+
+        function updateStudentBalance(newBalance) {
+            currentStudent.balance = newBalance;
+            var students = getStudents();
+            for (var i = 0; i < students.length; i++) {
+                if (students[i].studentId === currentStudent.studentId) {
+                    students[i].balance = newBalance;
+                    break;
+                }
+            }
+            saveStudents(students);
+            document.getElementById('studentBalance').innerText = newBalance.toFixed(2);
+            document.getElementById('balanceDisplay').innerText = newBalance.toFixed(2);
+        }
+
+        // 四级联动 - 默认无筛选
+        var currentCanteenId = null; // null 表示全部食堂
+        var currentStoreId = null; // null 表示全部店铺
+
+        function renderLevelSelectors() {
+            var canteens = getCanteens();
+            var canteenSelect = document.getElementById('canteenSelect');
+            canteenSelect.innerHTML = '<option value="">全部食堂</option>';
+            for (var i = 0; i < canteens.length; i++) {
+                canteenSelect.innerHTML += '<option value="' + canteens[i].id + '">' + canteens[i].name + '</option>';
+            }
+            canteenSelect.value = currentCanteenId !== null ? currentCanteenId : "";
+            updateStoreSelect();
+            canteenSelect.onchange = function() {
+                var val = canteenSelect.value;
+                currentCanteenId = val === "" ? null : parseInt(val, 10);
+                currentStoreId = null;
+                updateStoreSelect();
+                renderGoodsListByLevel();
+                updateBreadcrumb();
+            };
+            document.getElementById('storeSelect').onchange = function() {
+                var storeVal = document.getElementById('storeSelect').value;
+                currentStoreId = storeVal === "" ? null : parseInt(storeVal, 10);
+                renderGoodsListByLevel();
+                updateBreadcrumb();
+            };
+            document.getElementById('categorySelectLevel').onchange = function() {
+                renderGoodsListByLevel();
+            };
+            var searchInput = document.getElementById('goodsSearchLevel');
+            if (searchInput) searchInput.addEventListener('input', function() {
+                renderGoodsListByLevel();
+            });
+            updateStoreSelect();
+            renderGoodsListByLevel();
+            updateBreadcrumb();
+        }
+
+        function updateStoreSelect() {
+            var stores = [];
+            if (currentCanteenId === null) {
+                stores = getStores();
+            } else {
+                var allStores = getStores();
+                for (var i = 0; i < allStores.length; i++) {
+                    if (allStores[i].canteenId === currentCanteenId) stores.push(allStores[i]);
+                }
+            }
+            var storeSelect = document.getElementById('storeSelect');
+            storeSelect.innerHTML = '<option value="">全部店铺</option>';
+            for (var i = 0; i < stores.length; i++) {
+                storeSelect.innerHTML += '<option value="' + stores[i].id + '">' + stores[i].name + '</option>';
+            }
+            // 保持当前选中的店铺（若存在且在新列表中）
+            var found = false;
+            if (currentStoreId !== null) {
+                for (var i = 0; i < stores.length; i++) {
+                    if (stores[i].id === currentStoreId) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (found) {
+                storeSelect.value = currentStoreId;
+            } else {
+                currentStoreId = null;
+                storeSelect.value = "";
+            }
+        }
+
+        function updateBreadcrumb() {
+            var canteens = getCanteens();
+            var stores = getStores();
+            var canteenName = "全部食堂";
+            if (currentCanteenId !== null) {
+                for (var i = 0; i < canteens.length; i++) {
+                    if (canteens[i].id === currentCanteenId) {
+                        canteenName = canteens[i].name;
+                        break;
+                    }
+                }
+            }
+            var storeName = "全部店铺";
+            if (currentStoreId !== null) {
+                for (var i = 0; i < stores.length; i++) {
+                    if (stores[i].id === currentStoreId) {
+                        storeName = stores[i].name;
+                        break;
+                    }
+                }
+            }
+            document.getElementById('locationBreadcrumb').innerHTML = '<i class="fa-regular fa-compass"></i> ' + canteenName + ' → ' + storeName;
+        }
+
+        function renderGoodsListByLevel() {
+            var goods = getGoodsList().filter(function(g) {
+                return g.status === 'on';
+            });
+            // 按食堂筛选
+            if (currentCanteenId !== null) {
+                goods = goods.filter(function(g) {
+                    return g.canteenId === currentCanteenId;
+                });
+            }
+            // 按店铺筛选
+            if (currentStoreId !== null) {
+                goods = goods.filter(function(g) {
+                    return g.storeId === currentStoreId;
+                });
+            }
+            var categoryElem = document.getElementById('categorySelectLevel');
+            var category = categoryElem ? categoryElem.value : 'all';
+            if (category !== 'all') {
+                goods = goods.filter(function(g) {
+                    return g.type === category;
+                });
+            }
+            var keywordElem = document.getElementById('goodsSearchLevel');
+            var keyword = keywordElem ? keywordElem.value.toLowerCase() : '';
+            if (keyword) {
+                goods = goods.filter(function(g) {
+                    return g.name.toLowerCase().indexOf(keyword) !== -1;
+                });
+            }
+            var container = document.getElementById('goodsGrid');
+            if (!goods.length) {
+                container.innerHTML = '<div class="empty-data">🍽️ 暂无菜品，试试其他食堂/店铺～</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < goods.length; i++) {
+                var g = goods[i];
+                var cartItem = null;
+                for (var j = 0; j < cart.length; j++) {
+                    if (cart[j].goodsId === g.id) {
+                        cartItem = cart[j];
+                        break;
+                    }
+                }
+                var qtyInCart = cartItem ? cartItem.quantity : 0;
+                var stockLeft = g.stock - qtyInCart;
+                var disabled = stockLeft <= 0;
+                html += '<div class="goods-card">' +
+                    '<div class="goods-name">' + g.name + '</div>' +
+                    '<div class="goods-price">¥' + g.price + '</div>' +
+                    '<div class="goods-stock">📦 库存: ' + stockLeft + '</div>' +
+                    '<button class="btn btn-primary" ' + (disabled ? 'disabled' : '') + ' onclick="addToCart(' + g.id + ', \'' + g.name.replace(/'/g, "\\'") + '\', ' + g.price + ', ' + g.stock + ')">➕ 加入购物车</button>' +
+                    '<button class="btn btn-success" style="margin-left:8px;" onclick="quickBuy(' + g.id + ', \'' + g.name.replace(/'/g, "\\'") + '\', ' + g.price + ', ' + g.stock + ')">⚡ 立即购买</button>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // 购物车操作
+        function addToCart(id, name, price, stock) {
+            var goodsList = getGoodsList();
+            var goods = null;
+            for (var i = 0; i < goodsList.length; i++) {
+                if (goodsList[i].id === id) {
+                    goods = goodsList[i];
+                    break;
+                }
+            }
+            var realStock = goods ? goods.stock : stock;
+            var exist = null;
+            for (var i = 0; i < cart.length; i++) {
+                if (cart[i].goodsId === id) {
+                    exist = cart[i];
+                    break;
+                }
+            }
+            if (exist) {
+                if (exist.quantity + 1 > realStock) {
+                    alert('库存不足');
+                    return;
+                }
+                exist.quantity++;
+            } else {
+                if (1 > realStock) {
+                    alert('库存不足');
+                    return;
+                }
+                cart.push({
+                    goodsId: id,
+                    name: name,
+                    price: price,
+                    quantity: 1,
+                    stock: realStock
+                });
+            }
+            updateCartUI();
+            renderGoodsListByLevel();
+        }
+
+        function updateCartUI() {
+            var tbody = document.getElementById('cartTableBody');
+            var total = 0;
+            var html = '';
+            for (var i = 0; i < cart.length; i++) {
+                var item = cart[i];
+                var subtotal = item.price * item.quantity;
+                total += subtotal;
+                html += '<tr>' +
+                    '<td>' + item.name + '</td>' +
+                    '<td>¥' + item.price + '</td>' +
+                    '<td><button class="btn btn-default btn-sm" onclick="changeQty(' + i + ', -1)">-</button> ' + item.quantity + ' <button class="btn btn-default btn-sm" onclick="changeQty(' + i + ', 1)">+</button></td>' +
+                    '<td>¥' + subtotal.toFixed(2) + '</td>' +
+                    '<td><button class="btn btn-danger btn-sm" onclick="removeCartItem(' + i + ')">移除</button></td>' +
+                    '</tr>';
+            }
+            if (cart.length === 0) html = '<tr><td colspan="5" class="empty-data">🛒 购物车空空如也</td></tr>';
+            tbody.innerHTML = html;
+            document.getElementById('cartTotal').innerText = total.toFixed(2);
+            var count = 0;
+            for (var i = 0; i < cart.length; i++) count += cart[i].quantity;
+            var badge = document.getElementById('cartCountBadge');
+            if (count > 0) {
+                badge.innerText = count;
+                badge.style.display = 'inline-block';
+            } else badge.style.display = 'none';
+        }
+
+        function changeQty(idx, delta) {
+            var item = cart[idx];
+            var goodsList = getGoodsList();
+            var goods = null;
+            for (var i = 0; i < goodsList.length; i++) {
+                if (goodsList[i].id === item.goodsId) {
+                    goods = goodsList[i];
+                    break;
+                }
+            }
+            var maxStock = goods ? goods.stock : item.stock;
+            var newQty = item.quantity + delta;
+            if (newQty < 1) newQty = 1;
+            if (newQty > maxStock) {
+                alert('最多' + maxStock + '份');
+                return;
+            }
+            item.quantity = newQty;
+            updateCartUI();
+            renderGoodsListByLevel();
+        }
+
+        function removeCartItem(idx) {
+            cart.splice(idx, 1);
+            updateCartUI();
+            renderGoodsListByLevel();
+        }
+
+        function quickBuy(id, name, price, stock) {
+            cart = [{
+                goodsId: id,
+                name: name,
+                price: price,
+                quantity: 1,
+                stock: stock
+            }];
+            updateCartUI();
+            switchPage('cartPage');
+        }
+
+        // 下单及其他业务逻辑（完全复用原逻辑，确保层级兼容）
+        function submitOrder() {
+            if (cart.length === 0) {
+                alert('购物车为空');
+                return;
+            }
+            var totalAmount = 0;
+            var orderDetails = [];
+            for (var i = 0; i < cart.length; i++) {
+                var item = cart[i];
+                var goodsList = getGoodsList();
+                var goods = null;
+                for (var j = 0; j < goodsList.length; j++) {
+                    if (goodsList[j].id === item.goodsId) {
+                        goods = goodsList[j];
+                        break;
+                    }
+                }
+                if (!goods || goods.stock < item.quantity) {
+                    alert(item.name + '库存不足');
+                    return;
+                }
+                totalAmount += item.price * item.quantity;
+                orderDetails.push({
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price
+                });
+            }
+            if (currentStudent.balance < totalAmount) {
+                alert('余额不足，当前余额¥' + currentStudent.balance.toFixed(2));
+                return;
+            }
+            updateStudentBalance(currentStudent.balance - totalAmount);
+            var consumeRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.CONSUME_RECORDS)) || [];
+            var orderId = 'OD' + Date.now().toString().slice(-8);
+            var newOrder = {
+                orderId: orderId,
+                createTime: new Date().toLocaleString(),
+                goodsName: orderDetails.map(function(d) {
+                    return d.name + '×' + d.quantity;
+                }).join(','),
+                goodsNum: orderDetails.reduce(function(s, d) {
+                    return s + d.quantity;
+                }, 0),
+                totalAmount: totalAmount.toFixed(2),
+                payStatus: '已支付',
+                studentId: currentStudent.studentId,
+                studentName: currentStudent.name,
+                details: orderDetails
+            };
+            var pending = getPendingOrders();
+            pending.unshift(newOrder);
+            savePendingOrders(pending);
+            consumeRecords.push({
+                orderId: orderId,
+                time: newOrder.createTime,
+                amount: totalAmount,
+                studentId: currentStudent.studentId,
+                studentName: currentStudent.name,
+                goods: newOrder.goodsName
+            });
+            localStorage.setItem(STORAGE_KEYS.CONSUME_RECORDS, JSON.stringify(consumeRecords));
+            var goodsList = getGoodsList();
+            for (var i = 0; i < cart.length; i++) {
+                var item = cart[i];
+                for (var j = 0; j < goodsList.length; j++) {
+                    if (goodsList[j].id === item.goodsId) {
+                        goodsList[j].stock -= item.quantity;
+                        goodsList[j].sales = (goodsList[j].sales || 0) + item.quantity;
+                        break;
+                    }
+                }
+            }
+            saveGoodsList(goodsList);
+            cart = [];
+            updateCartUI();
+            alert('下单成功！订单号: ' + orderId);
+            switchPage('myOrders');
+            renderMyOrders();
+            renderGoodsListByLevel();
+        }
+
+        function renderMyOrders() {
+            var filter = document.getElementById('orderStatusFilter').value;
+            var pendingOrders = getPendingOrders().filter(function(o) {
+                return o.studentId === currentStudent.studentId;
+            }).map(function(o) {
+                o.status = 'pending';
+                return o;
+            });
+            var finishedOrders = getFinishedOrders().filter(function(o) {
+                return o.studentId === currentStudent.studentId;
+            }).map(function(o) {
+                o.status = 'finished';
+                return o;
+            });
+            var canceledOrders = getCanceledOrders().filter(function(o) {
+                return o.studentId === currentStudent.studentId;
+            }).map(function(o) {
+                o.status = 'canceled';
+                return o;
+            });
+            var allOrders = pendingOrders.concat(finishedOrders).concat(canceledOrders);
+            if (filter !== 'all') allOrders = allOrders.filter(function(o) {
+                return o.status === filter;
+            });
+            var tbody = document.getElementById('myOrdersBody');
+            if (!allOrders.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-data">暂无订单</td></tr>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < allOrders.length; i++) {
+                var o = allOrders[i];
+                var statusHtml = '';
+                var action = '';
+                if (o.status === 'pending') {
+                    statusHtml = '<span class="tag-pending">待处理</span>';
+                    action = '<button class="btn btn-danger btn-sm" onclick="cancelMyOrder(\'' + o.orderId + '\')">取消</button>';
+                } else if (o.status === 'finished') {
+                    statusHtml = '<span class="tag-finish">已完成</span>';
+                    action = '<button class="btn btn-primary btn-sm" onclick="openReviewForOrder(\'' + o.orderId + '\')">评价</button>';
+                } else {
+                    statusHtml = '<span class="tag-cancel">已取消</span>';
+                    action = '';
+                }
+                html += '<tr>' +
+                    '<td>' + o.orderId + '</td>' +
+                    '<td>' + o.createTime + '</td>' +
+                    '<td>' + o.goodsName + '</td>' +
+                    '<td>' + o.goodsNum + '</td>' +
+                    '<td>¥' + o.totalAmount + '</td>' +
+                    '<td>' + statusHtml + '</td>' +
+                    '<td>' + action + '</td>' +
+                    '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        function cancelMyOrder(orderId) {
+            var pending = getPendingOrders();
+            var idx = -1;
+            for (var i = 0; i < pending.length; i++) {
+                if (pending[i].orderId === orderId && pending[i].studentId === currentStudent.studentId) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx === -1) {
+                alert('无法取消');
+                return;
+            }
+            var order = pending[idx];
+            updateStudentBalance(currentStudent.balance + parseFloat(order.totalAmount));
+            var canceled = getCanceledOrders();
+            order.cancelReason = '学生取消';
+            order.cancelTime = new Date().toLocaleString();
+            canceled.unshift(order);
+            saveCanceledOrders(canceled);
+            pending.splice(idx, 1);
+            savePendingOrders(pending);
+            alert('已取消，余额退回');
+            renderMyOrders();
+        }
+
+        function recharge() {
+            var amt = parseFloat(document.getElementById('rechargeAmount').value);
+            if (isNaN(amt) || amt <= 0) {
+                alert('有效金额');
+                return;
+            }
+            updateStudentBalance(currentStudent.balance + amt);
+            var rec = JSON.parse(localStorage.getItem(STORAGE_KEYS.RECHARGE_RECORDS)) || [];
+            rec.push({
+                studentId: currentStudent.studentId,
+                studentName: currentStudent.name,
+                amount: amt,
+                time: new Date().toLocaleString(),
+                method: '在线充值'
+            });
+            localStorage.setItem(STORAGE_KEYS.RECHARGE_RECORDS, JSON.stringify(rec));
+            renderRechargeHistory();
+            alert('充值成功¥' + amt);
+        }
+
+        function renderRechargeHistory() {
+            var records = JSON.parse(localStorage.getItem(STORAGE_KEYS.RECHARGE_RECORDS)) || [];
+            var my = records.filter(function(r) {
+                return r.studentId === currentStudent.studentId;
+            });
+            var html = '';
+            for (var i = 0; i < my.length; i++) {
+                html += '<tr><td>' + my[i].time + '</td><td>¥' + my[i].amount + '</td><td>' + my[i].method + '</td></tr>';
+            }
+            document.getElementById('rechargeHistoryBody').innerHTML = html || '<tr><td colspan="3" class="empty-data">暂无</td></tr>';
+        }
+
+        function renderConsumeHistory() {
+            var rec = JSON.parse(localStorage.getItem(STORAGE_KEYS.CONSUME_RECORDS)) || [];
+            var my = rec.filter(function(r) {
+                return r.studentId === currentStudent.studentId;
+            });
+            var html = '';
+            for (var i = 0; i < my.length; i++) {
+                html += '<tr><td>' + my[i].orderId + '</td><td>' + my[i].time + '</td><td>¥' + my[i].amount + '</td><td>' + my[i].goods + '</td></tr>';
+            }
+            document.getElementById('consumeRecordBody').innerHTML = html || '<tr><td colspan="4" class="empty-data">无消费记录</td></tr>';
+        }
+
+        function openReviewForOrder(orderId) {
+            document.getElementById('reviewOrderId').value = orderId;
+            document.getElementById('reviewContent').value = '';
+            document.getElementById('ratingScore').value = '5';
+            document.getElementById('reviewModal').classList.add('active');
+        }
+
+        function submitReview() {
+            var orderId = document.getElementById('reviewOrderId').value;
+            var rating = parseInt(document.getElementById('ratingScore').value, 10);
+            var content = document.getElementById('reviewContent').value.trim();
+            if (!content) {
+                alert('请输入评价');
+                return;
+            }
+            var rev = JSON.parse(localStorage.getItem(STORAGE_KEYS.REVIEWS)) || [];
+            rev.push({
+                id: 'rev_' + Date.now(),
+                orderId: orderId,
+                studentId: currentStudent.studentId,
+                userName: currentStudent.name,
+                rating: rating,
+                content: content,
+                reply: '',
+                createTime: new Date().toLocaleString()
+            });
+            localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(rev));
+            closeModal('reviewModal');
+            alert('评价成功');
+            renderCanEvaluateOrders();
+        }
+
+        function renderCanEvaluateOrders() {
+            var finished = getFinishedOrders().filter(function(o) {
+                return o.studentId === currentStudent.studentId;
+            });
+            var reviews = JSON.parse(localStorage.getItem(STORAGE_KEYS.REVIEWS)) || [];
+            var evals = [];
+            for (var i = 0; i < reviews.length; i++) {
+                if (reviews[i].studentId === currentStudent.studentId) evals.push(reviews[i].orderId);
+            }
+            var can = finished.filter(function(o) {
+                return evals.indexOf(o.orderId) === -1;
+            });
+            var html = '';
+            for (var i = 0; i < can.length; i++) {
+                html += '<tr><td>' + can[i].orderId + '</td><td>' + can[i].goodsName + '</td><td>¥' + can[i].totalAmount + '</td><td><button class="btn btn-primary btn-sm" onclick="openReviewForOrder(\'' + can[i].orderId + '\')">写评价</button></td></tr>';
+            }
+            document.getElementById('canEvaluateOrders').innerHTML = html || '<tr><td colspan="4" class="empty-data">暂无待评价订单</td></tr>';
+        }
+
+        function openComplaintModal() {
+            document.getElementById('complaintModal').classList.add('active');
+        }
+
+        function submitComplaint() {
+            var content = document.getElementById('complaintContent').value.trim();
+            if (!content) {
+                alert('请输入内容');
+                return;
+            }
+            var comp = JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPLAINTS)) || [];
+            comp.push({
+                id: 'cp_' + Date.now(),
+                studentId: currentStudent.studentId,
+                userName: currentStudent.name,
+                content: content,
+                status: 'pending',
+                reply: '',
+                createTime: new Date().toLocaleString()
+            });
+            localStorage.setItem(STORAGE_KEYS.COMPLAINTS, JSON.stringify(comp));
+            closeModal('complaintModal');
+            document.getElementById('complaintContent').value = '';
+            renderMyComplaints();
+            alert('投诉已提交');
+        }
+
+        function renderMyComplaints() {
+            var comp = JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPLAINTS)) || [];
+            var my = comp.filter(function(c) {
+                return c.studentId === currentStudent.studentId;
+            });
+            var html = '';
+            for (var i = 0; i < my.length; i++) {
+                html += '<tr><td>' + my[i].content + '</td><td>' + (my[i].status === 'pending' ? '待处理' : '已回复') + '</td><td>' + (my[i].reply || '暂无回复') + '</td></tr>';
+            }
+            document.getElementById('myComplaintsBody').innerHTML = html || '<tr><td colspan="3" class="empty-data">暂无投诉</td></tr>';
+        }
+
+        function updateProfile() {
+            var newName = document.getElementById('profileName').value.trim();
+            var newPhone = document.getElementById('profilePhone').value.trim();
+            if (!newName) {
+                alert('姓名不能为空');
+                return;
+            }
+            currentStudent.name = newName;
+            currentStudent.phone = newPhone;
+            var students = getStudents();
+            for (var i = 0; i < students.length; i++) {
+                if (students[i].studentId === currentStudent.studentId) {
+                    students[i] = currentStudent;
+                    break;
+                }
+            }
+            saveStudents(students);
+            document.getElementById('studentName').innerText = currentStudent.name;
+            alert('个人信息已更新');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentStudentId');
+            alert('退出登录，刷新页面重新选择学生');
+            location.reload();
+        }
+
+        function switchPage(pageId) {
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+            document.getElementById(pageId).classList.add('active');
+            var titles = {
+                menuPage: '点餐大厅',
+                cartPage: '购物车',
+                myOrders: '我的订单',
+                rechargePage: '充值中心',
+                consumeHistory: '消费记录',
+                evaluatePage: '评价投诉',
+                profilePage: '个人中心'
+            };
+            var icon = 'list';
+            if (pageId === 'menuPage') icon = 'store';
+            else if (pageId === 'cartPage') icon = 'cart-shopping';
+            document.getElementById('pageTitle').innerHTML = '<i class="fa-solid fa-' + icon + '"></i> ' + titles[pageId];
+            if (pageId === 'menuPage') renderGoodsListByLevel();
+            if (pageId === 'cartPage') updateCartUI();
+            if (pageId === 'myOrders') renderMyOrders();
+            if (pageId === 'rechargePage') renderRechargeHistory();
+            if (pageId === 'consumeHistory') renderConsumeHistory();
+            if (pageId === 'evaluatePage') {
+                renderCanEvaluateOrders();
+                renderMyComplaints();
+            }
+            var menuItems = document.querySelectorAll('.menu-item');
+            for (var i = 0; i < menuItems.length; i++) menuItems[i].classList.remove('active');
+            var activeMenu = null;
+            for (var i = 0; i < menuItems.length; i++) {
+                var onclickAttr = menuItems[i].getAttribute('onclick');
+                if (onclickAttr && onclickAttr.indexOf("switchPage('" + pageId + "')") !== -1) {
+                    activeMenu = menuItems[i];
+                    break;
+                }
+            }
+            if (activeMenu) activeMenu.classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        window.onload = function() {
+            if (!localStorage.getItem('canteen_students')) {
+                localStorage.setItem('canteen_students', JSON.stringify([{
+                    studentId: 'S001',
+                    name: '张明',
+                    phone: '13900001111',
+                    balance: 186.5,
+                    password: '123'
+                }, {
+                    studentId: 'S002',
+                    name: '李芳',
+                    phone: '13900002222',
+                    balance: 320.0,
+                    password: '123'
+                }]));
+            }
+            initHierarchyData();
+            loadCurrentStudent();
+            renderLevelSelectors();
+            updateCartUI();
+            renderMyOrders();
+            renderRechargeHistory();
+            renderConsumeHistory();
+            renderCanEvaluateOrders();
+            renderMyComplaints();
+        };
+        window.addToCart = addToCart;
+        window.changeQty = changeQty;
+        window.removeCartItem = removeCartItem;
+        window.submitOrder = submitOrder;
+        window.cancelMyOrder = cancelMyOrder;
+        window.recharge = recharge;
+        window.openReviewForOrder = openReviewForOrder;
+        window.submitReview = submitReview;
+        window.openComplaintModal = openComplaintModal;
+        window.submitComplaint = submitComplaint;
+        window.updateProfile = updateProfile;
+        window.switchPage = switchPage;
+        window.closeModal = closeModal;
+        window.quickBuy = quickBuy;
+    </script>
+</body>
+
+</html>

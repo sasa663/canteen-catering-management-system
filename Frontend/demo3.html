@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂餐饮管理系统 - 超级管理中心</title>
+    <style>
+        /* ========== 原有样式保留并优化 ========== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 220px;
+            background: #2d8cf0;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            min-width: 220px;
+            max-width: 220px;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .menu-item {
+            padding: 14px 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        
+        .menu-item.active,
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .sub-menu {
+            background: #2379d1;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .sub-menu.active {
+            display: flex;
+        }
+        
+        .sub-item {
+            padding: 12px 35px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        
+        .sub-item.active,
+        .sub-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            padding: 6px 15px;
+            background: #f56c6c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .content {
+            padding: 15px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2d8cf0;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #36b36d;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f56c6c;
+            color: white;
+        }
+        
+        .btn-default {
+            background: #e5e7eb;
+            color: #666;
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+        }
+        
+        .select-input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-width: 120px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+            display: inline-block;
+        }
+        
+        .tag-normal {
+            background: #2d8cf0;
+        }
+        
+        .tag-expired {
+            background: #909399;
+        }
+        
+        .tag-pending {
+            background: #ff9500;
+        }
+        
+        .tag-handled {
+            background: #36b36d;
+        }
+        
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            display: none;
+            overflow-y: auto;
+        }
+        
+        .modal-mask.active {
+            display: flex;
+        }
+        
+        .modal-box {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-item label {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .form-item input,
+        .form-item select,
+        .form-item textarea {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .empty-data {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                min-width: 60px;
+            }
+            .sidebar-header,
+            .menu-item span:first-child,
+            .sub-item {
+                display: none;
+            }
+            .menu-item {
+                justify-content: center;
+                padding: 14px 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">食堂管理系统</div>
+        <div class="menu-item" onclick="toggleMenu('sysMenu')"><span><i class="fa-solid fa-chart-line"></i> 系统概览</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="sysMenu">
+            <div class="sub-item" onclick="switchPage('dashboard')">数据总览</div>
+            <div class="sub-item" onclick="switchPage('userManage')">全局用户管理</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('merchantMenu')"><span><i class="fa-solid fa-store"></i> 商家管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="merchantMenu">
+            <div class="sub-item" onclick="switchPage('merchantList')">商家基础信息</div>
+            <div class="sub-item" onclick="switchPage('qualificationCheck')">资质审核</div>
+            <div class="sub-item" onclick="switchPage('shopGoods')">门店&菜品管理</div>
+            <div class="sub-item" onclick="switchPage('merchantAccount')">账号权限管理</div>
+            <div class="sub-item" onclick="switchPage('orderMonitor')">运营订单监管</div>
+            <!-- 原评价投诉处理已移除，移至学生管理 -->
+            <div class="sub-item" onclick="switchPage('dataRisk')">数据与风控管理</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('adminMenu')"><span><i class="fa-solid fa-user-shield"></i> 管理员管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="adminMenu">
+            <div class="sub-item" onclick="switchPage('adminList')">普通管理员列表</div>
+            <div class="sub-item" onclick="switchPage('adminAdd')">新增普通管理员</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('authMenu')"><span><i class="fa-solid fa-key"></i> 授权管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="authMenu">
+            <div class="sub-item" onclick="switchPage('authManage')">授权码生成</div>
+            <div class="sub-item" onclick="switchPage('authRecord')">授权记录查询</div>
+        </div>
+        <div class="menu-item" onclick="toggleMenu('studentMenu')"><span><i class="fa-solid fa-user-graduate"></i> 学生管理</span><span><i class="fa-solid fa-chevron-down"></i></span></div>
+        <div class="sub-menu" id="studentMenu">
+            <div class="sub-item" onclick="switchPage('studentList')">学生信息列表</div>
+            <div class="sub-item" onclick="switchPage('rechargeRecord')">充值记录管理</div>
+            <!-- 新增：学生反馈处理（原评价投诉处理功能移至此） -->
+            <div class="sub-item" onclick="switchPage('commentComplaint')">学生反馈处理</div>
+            <div class="sub-item" onclick="switchPage('consumeStats')">消费统计分析</div>
+        </div>
+        <div class="menu-item" onclick="switchPage('profile')" style="margin-top: auto;"><span><i class="fa-solid fa-user"></i> 个人中心</span></div>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle">学生反馈处理</h2>
+            <div class="user-info"><span><i class="fa-solid fa-user-shield"></i> <span id="adminName">超级管理员</span></span><button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> 退出登录</button></div>
+        </div>
+        <div class="content">
+            <!-- 其他页面占位（保持原有结构，为简洁保留简要占位） -->
+            <div class="page" id="dashboard">
+                <div class="card">
+                    <div class="card-title">数据总览</div>
+                    <div class="empty-data">仪表板数据</div>
+                </div>
+            </div>
+            <div class="page" id="userManage">
+                <div class="card">
+                    <div class="card-title">全局用户列表</div>
+                    <div class="empty-data">用户数据管理</div>
+                </div>
+            </div>
+            <div class="page" id="merchantList">
+                <div class="card">
+                    <div class="card-title">商家基础信息</div>
+                    <div class="empty-data">商家数据</div>
+                </div>
+            </div>
+            <div class="page" id="qualificationCheck">
+                <div class="card">
+                    <div class="card-title">资质审核</div>
+                    <div class="empty-data">审核列表</div>
+                </div>
+            </div>
+            <div class="page" id="shopGoods">
+                <div class="card">
+                    <div class="card-title">门店菜品管理</div>
+                    <div class="empty-data">请选择商家</div>
+                </div>
+            </div>
+            <div class="page" id="merchantAccount">
+                <div class="card">
+                    <div class="card-title">商家账号权限</div>
+                    <div class="empty-data">账号列表</div>
+                </div>
+            </div>
+            <div class="page" id="orderMonitor">
+                <div class="card">
+                    <div class="card-title">订单监管</div>
+                    <div class="empty-data">订单数据</div>
+                </div>
+            </div>
+            <div class="page" id="dataRisk">
+                <div class="card">
+                    <div class="card-title">数据风控</div>
+                    <div class="empty-data">风控数据</div>
+                </div>
+            </div>
+            <div class="page" id="profile">
+                <div class="card">
+                    <div class="card-title">个人信息</div>
+                    <div class="empty-data">个人设置</div>
+                </div>
+            </div>
+            <div class="page" id="studentList">
+                <div class="card">
+                    <div class="card-title">学生信息列表</div>
+                    <div class="empty-data">学生数据</div>
+                </div>
+            </div>
+            <div class="page" id="rechargeRecord">
+                <div class="card">
+                    <div class="card-title">充值记录</div>
+                    <div class="empty-data">充值记录</div>
+                </div>
+            </div>
+            <div class="page" id="consumeStats">
+                <div class="card">
+                    <div class="card-title">消费统计</div>
+                    <div class="empty-data">统计报表</div>
+                </div>
+            </div>
+            <div class="page" id="adminList">
+                <div class="card">
+                    <div class="card-title">普通管理员列表</div>
+                    <div class="empty-data">管理员数据</div>
+                </div>
+            </div>
+            <div class="page" id="adminAdd">
+                <div class="card">
+                    <div class="card-title">新增管理员</div>
+                    <div class="empty-data">表单</div>
+                </div>
+            </div>
+            <div class="page" id="authManage">
+                <div class="card">
+                    <div class="card-title">授权码管理</div>
+                    <div class="empty-data">授权模块</div>
+                </div>
+            </div>
+            <div class="page" id="authRecord">
+                <div class="card">
+                    <div class="card-title">授权记录查询</div>
+                    <div class="empty-data">授权记录</div>
+                </div>
+            </div>
+
+            <!-- ★ 学生反馈处理页面（完整功能，符合图片样式）★ -->
+            <div class="page" id="commentComplaint">
+                <div class="card">
+                    <div class="card-title">
+                        <span><i class="fa-solid fa-message"></i> 学生反馈处理</span>
+                        <button class="btn btn-success" onclick="openAddFeedbackModal()"><i class="fa-solid fa-plus"></i> 新增反馈</button>
+                    </div>
+                    <!-- 搜索筛选栏 -->
+                    <div class="search-filter">
+                        <input type="text" id="feedbackSearchInput" class="search-input" placeholder="搜索学号/姓名/反馈内容" style="max-width: 300px;">
+                        <select id="feedbackStatusFilter" class="select-input">
+                            <option value="all">全部状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="handled">已处理</option>
+                        </select>
+                        <button class="btn btn-primary" id="searchFeedbackBtn"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>反馈ID</th>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>反馈内容</th>
+                                    <th>提交时间</th>
+                                    <th>状态</th>
+                                    <th>回复内容</th>
+                                    <th>处理人</th>
+                                    <th>处理时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbackTableBody">
+                                <tr>
+                                    <td colspan="10" class="empty-data">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增反馈模态框 -->
+    <div class="modal-mask" id="addFeedbackModal">
+        <div class="modal-box">
+            <div class="card-title" style="margin-bottom: 15px;">新增反馈</div>
+            <div class="modal-form">
+                <div class="form-item"><label>学号 <span style="color:red">*</span></label><input type="text" id="addStuNo" placeholder="请输入学号"></div>
+                <div class="form-item"><label>姓名 <span style="color:red">*</span></label><input type="text" id="addStuName" placeholder="请输入姓名"></div>
+                <div class="form-item"><label>反馈内容 <span style="color:red">*</span></label><textarea rows="3" id="addFeedbackContent" placeholder="请详细描述反馈内容..."></textarea></div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" onclick="closeModal('addFeedbackModal')">取消</button>
+                    <button class="btn btn-primary" onclick="submitNewFeedback()">提交反馈</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 回复反馈模态框 -->
+    <div class="modal-mask" id="replyFeedbackModal">
+        <div class="modal-box">
+            <div class="card-title" style="margin-bottom: 15px;">回复反馈</div>
+            <div class="modal-form">
+                <div class="form-item"><label>反馈ID</label><input type="text" id="replyFeedbackId" disabled></div>
+                <div class="form-item"><label>学号/姓名</label><input type="text" id="replyStuInfo" disabled></div>
+                <div class="form-item"><label>原反馈内容</label><textarea rows="2" id="replyOriginalContent" disabled></textarea></div>
+                <div class="form-item"><label>回复内容 <span style="color:red">*</span></label><textarea rows="3" id="replyContentText" placeholder="请输入回复内容..."></textarea></div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" onclick="closeModal('replyFeedbackModal')">取消</button>
+                    <button class="btn btn-primary" onclick="saveReply()">保存回复</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 反馈数据管理 (符合截图样式) ----------
+        let feedbackList = [{
+            id: 1001,
+            studentId: "20240001",
+            studentName: "李明",
+            content: "二楼麻辣烫窗口卫生需要加强。",
+            submitTime: "2025-03-20 12:30",
+            status: "pending", // pending待处理, handled已处理
+            replyContent: "",
+            handler: "",
+            handleTime: ""
+        }, {
+            id: 1002,
+            studentId: "20240012",
+            studentName: "王芳",
+            content: "希望增加轻食沙拉窗口。",
+            submitTime: "2025-03-22 09:15",
+            status: "pending",
+            replyContent: "",
+            handler: "",
+            handleTime: ""
+        }, {
+            id: 1003,
+            studentId: "20231005",
+            studentName: "张伟",
+            content: "线上订餐系统卡顿。",
+            submitTime: "2025-03-18 14:20",
+            status: "handled",
+            replyContent: "已优化带宽，系统运行流畅。",
+            handler: "超级管理员",
+            handleTime: "2025-03-19 10:30"
+        }];
+        let nextFeedbackId = 1004;
+
+        function formatDateTimeForPicker(date) {
+            let d = new Date(date);
+            let year = d.getFullYear();
+            let month = (d.getMonth() + 1).toString().padStart(2, '0');
+            let day = d.getDate().toString().padStart(2, '0');
+            let hour = d.getHours().toString().padStart(2, '0');
+            let minute = d.getMinutes().toString().padStart(2, '0');
+            return `${year}-${month}-${day} ${hour}:${minute}`;
+        }
+
+        function renderFeedbackTable() {
+            const searchKeyword = document.getElementById('feedbackSearchInput') ? document.getElementById('feedbackSearchInput').value.toLowerCase() : '';
+            const statusFilter = document.getElementById('feedbackStatusFilter') ? document.getElementById('feedbackStatusFilter').value : 'all';
+            let filtered = [...feedbackList];
+            if (searchKeyword) {
+                filtered = filtered.filter(item =>
+                    item.studentId.toLowerCase().includes(searchKeyword) ||
+                    item.studentName.toLowerCase().includes(searchKeyword) ||
+                    item.content.toLowerCase().includes(searchKeyword)
+                );
+            }
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(item => item.status === statusFilter);
+            }
+            const tbody = document.getElementById('feedbackTableBody');
+            if (!tbody) return;
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-data">暂无反馈数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(fb => {
+                const statusText = fb.status === 'pending' ? '待处理' : '已处理';
+                const statusClass = fb.status === 'pending' ? 'tag-pending' : 'tag-handled';
+                const replyDisplay = fb.replyContent ? (fb.replyContent.length > 30 ? fb.replyContent.substring(0, 27) + '...' : fb.replyContent) : '—';
+                const handlerDisplay = fb.handler || '—';
+                const handleTimeDisplay = fb.handleTime || '—';
+                return `
+                    <tr>
+                        <td>${fb.id}</td>
+                        <td>${escapeHtml(fb.studentId)}</td>
+                        <td>${escapeHtml(fb.studentName)}</td>
+                        <td style="max-width:200px; word-break:break-word;">${escapeHtml(fb.content)}</td>
+                        <td>${fb.submitTime}</td>
+                        <td><span class="tag ${statusClass}">${statusText}</span></td>
+                        <td style="max-width:180px; word-break:break-word;">${escapeHtml(replyDisplay)}</td>
+                        <td>${escapeHtml(handlerDisplay)}</td>
+                        <td>${escapeHtml(handleTimeDisplay)}</td>
+                        <td class="action-btns">
+                            <button class="btn btn-primary btn-sm" onclick="openReplyModal(${fb.id})"><i class="fa-solid fa-reply"></i> 回复</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteFeedback(${fb.id})"><i class="fa-solid fa-trash"></i> 删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openAddFeedbackModal() {
+            document.getElementById('addStuNo').value = '';
+            document.getElementById('addStuName').value = '';
+            document.getElementById('addFeedbackContent').value = '';
+            openModal('addFeedbackModal');
+        }
+
+        function submitNewFeedback() {
+            const stuNo = document.getElementById('addStuNo').value.trim();
+            const stuName = document.getElementById('addStuName').value.trim();
+            const content = document.getElementById('addFeedbackContent').value.trim();
+            if (!stuNo || !stuName || !content) {
+                alert('请完整填写学号、姓名和反馈内容');
+                return;
+            }
+            const now = new Date();
+            const submitTimeStr = formatDateTimeForPicker(now);
+            const newFeedback = {
+                id: nextFeedbackId++,
+                studentId: stuNo,
+                studentName: stuName,
+                content: content,
+                submitTime: submitTimeStr,
+                status: "pending",
+                replyContent: "",
+                handler: "",
+                handleTime: ""
+            };
+            feedbackList.unshift(newFeedback);
+            renderFeedbackTable();
+            closeModal('addFeedbackModal');
+            alert('反馈提交成功！');
+        }
+
+        let currentReplyId = null;
+
+        function openReplyModal(feedbackId) {
+            const feedback = feedbackList.find(f => f.id === feedbackId);
+            if (!feedback) return;
+            currentReplyId = feedbackId;
+            document.getElementById('replyFeedbackId').value = feedback.id;
+            document.getElementById('replyStuInfo').value = `${feedback.studentName} (学号:${feedback.studentId})`;
+            document.getElementById('replyOriginalContent').value = feedback.content;
+            document.getElementById('replyContentText').value = feedback.replyContent || '';
+            openModal('replyFeedbackModal');
+        }
+
+        function saveReply() {
+            if (!currentReplyId) return;
+            const replyText = document.getElementById('replyContentText').value.trim();
+            if (!replyText) {
+                alert('请填写回复内容');
+                return;
+            }
+            const idx = feedbackList.findIndex(f => f.id === currentReplyId);
+            if (idx !== -1) {
+                const now = new Date();
+                const handleTimeStr = formatDateTimeForPicker(now);
+                feedbackList[idx].replyContent = replyText;
+                feedbackList[idx].status = "handled";
+                feedbackList[idx].handler = "超级管理员";
+                feedbackList[idx].handleTime = handleTimeStr;
+                renderFeedbackTable();
+                closeModal('replyFeedbackModal');
+                alert('回复成功，状态已更新为已处理');
+            }
+            currentReplyId = null;
+        }
+
+        function deleteFeedback(feedbackId) {
+            if (confirm('确定要删除该反馈吗？')) {
+                feedbackList = feedbackList.filter(f => f.id !== feedbackId);
+                renderFeedbackTable();
+            }
+        }
+
+        function bindSearchEvents() {
+            const searchBtn = document.getElementById('searchFeedbackBtn');
+            const searchInput = document.getElementById('feedbackSearchInput');
+            const statusFilter = document.getElementById('feedbackStatusFilter');
+            if (searchBtn) searchBtn.addEventListener('click', () => renderFeedbackTable());
+            if (searchInput) searchInput.addEventListener('input', () => renderFeedbackTable());
+            if (statusFilter) statusFilter.addEventListener('change', () => renderFeedbackTable());
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // 菜单/页面控制
+        function toggleMenu(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('active');
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) targetPage.classList.add('active');
+            const titleEl = document.getElementById('pageTitle');
+            if (pageId === 'commentComplaint') {
+                titleEl.innerText = '学生反馈处理';
+            } else if (pageId === 'dashboard') {
+                titleEl.innerText = '数据总览';
+            } else if (pageId === 'merchantList') {
+                titleEl.innerText = '商家基础信息';
+            } else if (pageId === 'adminList') {
+                titleEl.innerText = '普通管理员列表';
+            } else if (pageId === 'studentList') {
+                titleEl.innerText = '学生信息列表';
+            } else if (pageId === 'rechargeRecord') {
+                titleEl.innerText = '充值记录管理';
+            } else if (pageId === 'consumeStats') {
+                titleEl.innerText = '消费统计分析';
+            } else if (pageId === 'authManage') {
+                titleEl.innerText = '授权码生成';
+            } else if (pageId === 'authRecord') {
+                titleEl.innerText = '授权记录查询';
+            } else if (pageId === 'profile') {
+                titleEl.innerText = '个人中心';
+            } else if (pageId === 'userManage') {
+                titleEl.innerText = '全局用户管理';
+            } else {
+                titleEl.innerText = pageId;
+            }
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
+        }
+
+        function logout() {
+            if (confirm('确定退出登录？')) alert('已退出');
+        }
+        // 其他占位函数保证侧边栏点击不报错
+        function saveProfile() {
+            alert('个人信息保存成功');
+        }
+
+        function openEditMerchantModal() {
+            alert('新增商家功能');
+        }
+
+        function saveMerchant() {
+            alert('商家保存成功');
+            closeModal('editMerchantModal');
+        }
+
+        function saveStudent() {
+            alert('学生保存成功');
+            closeModal('addStudentModal');
+        }
+
+        function addAdmin() {
+            alert('管理员新增成功');
+            switchPage('adminList');
+        }
+
+        function openAddAdminModal() {
+            switchPage('adminAdd');
+        }
+        window.generateMerchantAuthCode = function() {
+            alert('授权码功能已保留，请在授权管理页使用');
+        };
+        window.generateAdminAuthCode = function() {
+            alert('注册码功能已保留');
+        };
+        window.copyAuthCode = function() {
+            alert('复制功能');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFeedbackTable();
+            bindSearchEvents();
+            // 默认激活学生反馈处理页面
+            switchPage('commentComplaint');
+        });
+        // 挂载全局函数供HTML调用
+        window.openAddFeedbackModal = openAddFeedbackModal;
+        window.submitNewFeedback = submitNewFeedback;
+        window.openReplyModal = openReplyModal;
+        window.saveReply = saveReply;
+        window.deleteFeedback = deleteFeedback;
+        window.renderFeedbackTable = renderFeedbackTable;
+        window.toggleMenu = toggleMenu;
+        window.switchPage = switchPage;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.logout = logout;
+        window.saveProfile = saveProfile;
+        window.openEditMerchantModal = openEditMerchantModal;
+        window.saveMerchant = saveMerchant;
+        window.saveStudent = saveStudent;
+        window.addAdmin = addAdmin;
+        window.openAddAdminModal = openAddAdminModal;
+    </script>
+</body>
+
+</html>

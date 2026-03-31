@@ -187,67 +187,48 @@
             let role = document.querySelector('input[name="role"]:checked').value;
             let hasError = false;
 
-            // 验证账号
+            // 前端基础验证
             if (!username) {
                 document.getElementById('usernameTip').textContent = '账号不能为空！';
                 document.getElementById('usernameTip').style.display = 'block';
                 hasError = true;
-            } else if (username.length < 4) {
-                document.getElementById('usernameTip').textContent = '账号至少4位！';
-                document.getElementById('usernameTip').style.display = 'block';
-                hasError = true;
             }
-
-            // 验证密码
-            if (!password) {
-                document.getElementById('passwordTip').textContent = '密码不能为空！';
-                document.getElementById('passwordTip').style.display = 'block';
-                hasError = true;
-            } else if (password.length < 6) {
+            if (password.length < 6) {
                 document.getElementById('passwordTip').textContent = '密码至少6位！';
                 document.getElementById('passwordTip').style.display = 'block';
                 hasError = true;
             }
-
             if (hasError) return;
 
-            // 从本地存储读取用户
-            let userStr = localStorage.getItem("user_" + username);
-            if (!userStr) {
-                alert("账号不存在，请先注册！");
-                return;
-            }
-
-            let user = JSON.parse(userStr);
-
-            // 分情况提示错误
-            if (user.password !== password) {
-                alert("密码错误！");
-                return;
-            }
-            if (user.role !== role) {
-                alert("角色选择错误！当前账号的角色是：" +
-                    (user.role === 'student' ? '学生' : user.role === 'merchant' ? '商家' : '管理员'));
-                return;
-            }
-
-            // 存储当前登录用户信息
-            localStorage.setItem('currentUser', JSON.stringify({
-                username: username,
-                role: role,
-                nickname: user.nickname || username
-            }));
-
-            // 根据角色显示不同欢迎语
-            let roleName = {
-                student: '同学',
-                merchant: '商家',
-                admin: '管理员'
-            }[role];
-
-            alert(`登录成功！欢迎回来，${roleName}！`);
-            // 跳转到首页（启用跳转）
-            location.href = "Admin.html";
+            // 👇 核心：正确调用后端接口，地址必须写全 localhost:8080
+            fetch('http://localhost:8080/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        username: username,
+                        password: password,
+                        role: role
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`请求失败，状态码：${res.status}`);
+                    }
+                    return res.text();
+                })
+                .then(msg => {
+                    alert(msg); // 弹出后端真实返回结果
+                    if (msg === "登录成功") {
+                        // 登录成功，跳转到管理员页面
+                        location.href = "Admin.html";
+                    }
+                })
+                .catch(err => {
+                    alert("连接失败：" + err.message);
+                    console.error("详细错误：", err);
+                });
         }
 
         // 输入框聚焦时清空提示
